@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Buffett App"/>
+<meta name="theme-color" content="#d97706"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="https://img.icons8.com/emoji/192/chart-increasing-emoji.png"/>
+<title>Buffett Value Evaluator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;min-height:-webkit-fill-available;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.header{background:linear-gradient(135deg,#92400e,#d97706);color:white;padding:16px 16px 24px;padding-top:calc(16px + env(safe-area-inset-top))}
+.header h1{font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px}
+.header p{font-size:12px;color:#fde68a;margin-top:3px}
+.search-row{display:flex;gap:8px;margin-top:12px}
+.search-row input{flex:1;border:none;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:700;font-family:monospace;color:#1f2937;outline:none;text-transform:uppercase;-webkit-appearance:none}
+.search-row button{background:#1f2937;color:white;border:none;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:700;cursor:pointer;-webkit-appearance:none}
+.status-bar{font-size:11px;padding:5px 16px;text-align:center;background:#1e3a5f;color:#93c5fd}
+.quota-bar{background:#1c1c1e;color:#fde68a;font-size:11px;padding:5px 16px;text-align:center}
+.container{max-width:480px;margin:0 auto;padding:0 16px 100px}
+.loading{text-align:center;padding:60px 20px}
+.spinner{width:48px;height:48px;border:4px solid #fde68a;border-top-color:#d97706;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{color:#92400e;font-weight:600;font-size:14px;margin-top:8px}
+.error-box{background:#fef2f2;border:1px solid #fecaca;border-radius:14px;padding:20px;margin-top:16px;text-align:center}
+.error-box h3{font-size:16px;color:#dc2626;margin-bottom:8px}
+.error-box p{font-size:13px;color:#4b5563;line-height:1.6}
+.company-header{background:white;border-radius:14px;border:1px solid #f3f4f6;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin:16px 0 12px;display:flex;justify-content:space-between;align-items:flex-start}
+.company-header h2{font-size:18px;font-weight:800;color:#1f2937}
+.up{color:#16a34a}.down{color:#dc2626}
+.verdict-card{border-radius:16px;padding:24px;text-align:center;margin-bottom:12px}
+.score-box{background:white;border-radius:10px;padding:8px 24px;display:inline-block;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.metric-box{background:white;border-radius:12px;border:1px solid #f3f4f6;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
+.mlabel{font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
+.mvalue{font-size:18px;font-weight:800;color:#1f2937}
+.msub{font-size:10px;color:#6b7280;margin-top:2px}
+.result-section{background:white;border-radius:14px;border:1px solid #f3f4f6;padding:16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.result-section h3{font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;display:flex;justify-content:space-between}
+.progress-bar{background:#f3f4f6;border-radius:99px;height:8px;margin-bottom:12px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;transition:width 0.7s ease}
+.check-item{font-size:12px;color:#4b5563;display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;line-height:1.4}
+.check-ok{color:#22c55e;font-weight:700;flex-shrink:0}
+.check-no{color:#f87171;font-weight:700;flex-shrink:0}
+.quote-box{background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:16px;margin-bottom:12px;text-align:center}
+.quote-box p{font-size:12px;color:#92400e;font-style:italic;line-height:1.6}
+.quote-box span{font-size:11px;color:#d97706;margin-top:6px;display:block}
+.btn-save{width:100%;padding:14px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px}
+.btn-reset{width:100%;padding:14px;background:white;border:1.5px solid #e5e7eb;color:#4b5563;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px}
+.watchlist-card{background:white;border-radius:14px;border:1px solid #f3f4f6;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:16px}
+.watchlist-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f3f4f6}
+.watchlist-item:last-child{border-bottom:none}
+.disclaimer{font-size:10px;color:#9ca3af;text-align:center;padding:8px 0 16px;line-height:1.5}
+.welcome{text-align:center;padding:40px 20px 20px}
+.install-banner{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:white;border-radius:14px;padding:16px;margin-top:16px;display:none}
+.install-banner h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.install-banner p{font-size:12px;opacity:0.9;line-height:1.6}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #f3f4f6;padding:8px 0;padding-bottom:calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;box-shadow:0 -2px 10px rgba(0,0,0,0.08);z-index:100}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:4px 0}
+.nav-btn span:first-child{font-size:22px}
+.nav-btn span:last-child{font-size:10px;font-weight:600;color:#9ca3af}
+.nav-btn.active span:last-child{color:#d97706}
+.page{display:none}.page.active{display:block}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧓 Buffett Evaluator</h1>
+  <p>Warren Buffett-style stock analysis</p>
+  <div class="search-row">
+    <input type="text" id="tickerInput" placeholder="AAPL, MSFT, KO..." maxlength="10" autocomplete="off" autocorrect="off" spellcheck="false"/>
+    <button onclick="analyzeStock()">🔍</button>
+  </div>
+</div>
+
+<div class="status-bar" id="statusBar">🟢 Ready — Enter a US stock ticker</div>
+<div class="quota-bar" id="quotaBar">📊 Loading quota info...</div>
+
+<div class="container">
+  <!-- Analyze Page -->
+  <div class="page active" id="page-analyze">
+    <div id="results">
+      <div class="welcome">
+        <div style="font-size:56px;margin-bottom:12px">📈</div>
+        <div style="font-size:17px;font-weight:700;color:#374151;margin-bottom:8px">Ready to Analyze</div>
+        <div style="font-size:13px;color:#6b7280;line-height:2">
+          <strong>AAPL</strong> · <strong>MSFT</strong> · <strong>KO</strong> · <strong>JNJ</strong> · <strong>WMT</strong>
+        </div>
+        <div id="installBanner" class="install-banner">
+          <h3>📱 Install as iPhone App</h3>
+          <p>Tap <strong>Share ↑</strong> in Safari then<br/><strong>"Add to Home Screen"</strong><br/>to use this as a real app!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Watchlist Page -->
+  <div class="page" id="page-watchlist">
+    <div style="padding-top:16px" id="watchlistView"></div>
+  </div>
+
+  <!-- Settings Page -->
+  <div class="page" id="page-settings">
+    <div style="padding-top:16px">
+      <div class="watchlist-card">
+        <div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:16px">⚙️ Settings</div>
+        <div style="font-size:13px;color:#4b5563;margin-bottom:8px;font-weight:600">Alpha Vantage API Key</div>
+        <input id="apiKeyInput" type="text" value="8CWC4MJFBVMYX2FN"
+          style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;font-size:13px;font-family:monospace;outline:none;margin-bottom:10px"/>
+        <button onclick="saveApiKey()" style="width:100%;padding:11px;background:#d97706;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer">
+          💾 Save API Key
+        </button>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f3f4f6">
+          <div style="font-size:13px;color:#4b5563;margin-bottom:8px;font-weight:600">API Usage Today</div>
+          <div id="settingsQuota" style="font-size:13px;color:#6b7280"></div>
+        </div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f3f4f6">
+          <div style="font-size:13px;color:#4b5563;margin-bottom:8px;font-weight:600">Get More API Calls</div>
+          <div style="font-size:12px;color:#6b7280;line-height:1.6">Free tier: 25 calls/day<br/>
+          Get a second free key at:<br/>
+          <strong style="color:#d97706">alphavantage.co/support/#api-key</strong></div>
+        </div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f3f4f6">
+          <button onclick="clearWatchlist()" style="width:100%;padding:11px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer">
+            🗑️ Clear Watchlist
+          </button>
+        </div>
+      </div>
+      <div class="watchlist-card">
+        <div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:12px">📱 Install as iPhone App</div>
+        <div style="font-size:13px;color:#4b5563;line-height:1.8">
+          1. Open this page in <strong>Safari</strong><br/>
+          2. Tap the <strong>Share ↑</strong> button<br/>
+          3. Tap <strong>"Add to Home Screen"</strong><br/>
+          4. Tap <strong>"Add"</strong> — done! 🎉<br/><br/>
+          The app will appear on your home screen and run full screen with no browser bar!
+        </div>
+      </div>
+      <p class="disclaimer">⚠️ For educational purposes only. Not financial advice. Always do your own research before investing.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-analyze" onclick="showPage('analyze')">
+    <span>🔍</span><span>Analyze</span>
+  </button>
+  <button class="nav-btn" id="nav-watchlist" onclick="showPage('watchlist')">
+    <span>📋</span><span>Watchlist</span>
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="showPage('settings')">
+    <span>⚙️</span><span>Settings</span>
+  </button>
+</div>
+
+<script>
+// ── State ──
+let AV_KEY = localStorage.getItem('av_key') || '8CWC4MJFBVMYX2FN';
+let watchlist = [];
+let callsToday = 0;
+
+try {
+  watchlist = JSON.parse(localStorage.getItem('buffett_wl') || '[]');
+  const today = new Date().toDateString();
+  const saved = JSON.parse(localStorage.getItem('av_quota') || '{"date":"","calls":0}');
+  if(saved.date === today) callsToday = saved.calls;
+  else { callsToday = 0; saveQuota(); }
+} catch(e){}
+
+// ── Register Service Worker ──
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+// ── Show install banner in Safari ──
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.navigator.standalone;
+if(isIOS && !isStandalone){
+  document.getElementById('installBanner').style.display = 'block';
+}
+
+// ── Quota ──
+function saveQuota(){
+  localStorage.setItem('av_quota', JSON.stringify({date:new Date().toDateString(), calls:callsToday}));
+  const rem = 25 - callsToday;
+  document.getElementById('quotaBar').textContent = `📊 API calls today: ${callsToday}/25  (${rem} remaining)`;
+  document.getElementById('settingsQuota').textContent = `${callsToday} used · ${rem} remaining today`;
+}
+saveQuota();
+
+// ── Navigation ──
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='watchlist') renderWatchlist();
+  if(name==='settings') document.getElementById('apiKeyInput').value = AV_KEY;
+}
+
+function saveApiKey(){
+  AV_KEY = document.getElementById('apiKeyInput').value.trim();
+  localStorage.setItem('av_key', AV_KEY);
+  alert('✅ API key saved!');
+}
+
+function clearWatchlist(){
+  if(confirm('Clear all watchlist stocks?')){
+    watchlist=[];
+    localStorage.setItem('buffett_wl','[]');
+    renderWatchlist();
+    alert('✅ Watchlist cleared');
+  }
+}
+
+// ── Input ──
+document.getElementById('tickerInput').addEventListener('keypress', e=>{
+  if(e.key==='Enter') analyzeStock();
+});
+
+// ── Status ──
+function setStatus(msg, color='#93c5fd'){
+  const b=document.getElementById('statusBar');
+  b.textContent=msg; b.style.color=color;
+}
+
+// ── Fetch ──
+async function analyzeStock(){
+  const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+  if(!ticker){ alert('Please enter a stock ticker'); return; }
+  if(callsToday>=24){
+    document.getElementById('results').innerHTML=`<div class="error-box" style="margin-top:16px">
+      <h3>⏰ Daily Limit Reached</h3>
+      <p>You've used all 25 free API calls today.<br/><br/>
+      <strong>Resets at midnight US Eastern time.</strong><br/><br/>
+      💡 Get a second free key at:<br/><strong>alphavantage.co/support/#api-key</strong></p>
+    </div>`;
+    return;
+  }
+
+  showPage('analyze');
+  const results=document.getElementById('results');
+  results.innerHTML=`<div class="loading">
+    <div class="spinner"></div>
+    <p>Analyzing <strong>${ticker}</strong>...</p>
+    <p style="font-size:11px;color:#9ca3af;margin-top:8px">${25-callsToday} API calls remaining today</p>
+  </div>`;
+  setStatus(`⏳ Loading ${ticker}...`,'#fde68a');
+
+  try{
+    const url=`https://www.alphavantage.co/query?function=OVERVIEW&symbol=${ticker}&apikey=${AV_KEY}`;
+    const res=await fetch(url);
+    if(!res.ok) throw new Error(`Network error ${res.status}`);
+    const ov=await res.json();
+    callsToday++; saveQuota();
+
+    if(ov['Note']) throw new Error('Rate limit hit. Wait 1 minute and retry.');
+    if(ov['Information']) throw new Error('Daily limit reached (25/day). Come back tomorrow!');
+    if(!ov['Name']) throw new Error(`"${ticker}" not found. Check the symbol — e.g. AAPL, MSFT, KO`);
+
+    const n=v=>parseFloat(v)||0;
+    const companyName = ov['Name']||ticker;
+    const sector      = ov['Sector']||'';
+    const industry    = ov['Industry']||'';
+    const mktCap      = n(ov['MarketCapitalization']);
+    const eps         = n(ov['EPS']);
+    const peRatio     = n(ov['PERatio']);
+    const forwardPE   = n(ov['ForwardPE']);
+    const pegRatio    = n(ov['PEGRatio']);
+    const pbRatio     = n(ov['PriceToBookRatio']);
+    const pSales      = n(ov['PriceToSalesRatioTTM']);
+    const divYield    = n(ov['DividendYield'])*100;
+    const roe         = n(ov['ReturnOnEquityTTM'])*100;
+    const roa         = n(ov['ReturnOnAssetsTTM'])*100;
+    const netMargin   = n(ov['ProfitMargin'])*100;
+    const opMargin    = n(ov['OperatingMarginTTM'])*100;
+    const revGrowth   = n(ov['QuarterlyRevenueGrowthYOY'])*100;
+    const earningsG   = n(ov['QuarterlyEarningsGrowthYOY'])*100;
+    const analystTgt  = n(ov['AnalystTargetPrice']);
+    const beta        = n(ov['Beta']);
+    const week52High  = n(ov['52WeekHigh']);
+    const week52Low   = n(ov['52WeekLow']);
+    const bookValue   = n(ov['BookValue']);
+    const evEbitda    = n(ov['EVToEBITDA']);
+    const debtToEq    = n(ov['DebtToEquity'])/100;
+    const currentR    = n(ov['CurrentRatio']);
+    const sharesOut   = n(ov['SharesOutstanding']);
+    const revPerShare = n(ov['RevenuePerShareTTM']);
+
+    // ── DCF ──
+    const g=Math.min(Math.max(earningsG>0?earningsG/100:revGrowth>0?revGrowth/100:0.08,0.03),0.25);
+    const tg=0.03,dr=0.10,yrs=10;
+    let iv=0;
+    if(eps>0){
+      let cf=eps;
+      for(let i=1;i<=yrs;i++){cf*=(1+g);iv+=cf/Math.pow(1+dr,i);}
+      iv+=(cf*(1+tg)/(dr-tg))/Math.pow(1+dr,yrs);
+    }
+    const refPrice=analystTgt>0?analystTgt*0.95:pbRatio>0&&bookValue>0?pbRatio*bookValue:0;
+    const mos=refPrice>0&&iv>0?((iv-refPrice)/iv)*100:null;
+    const dcfScore=mos===null?0:mos>=30?25:mos>=10?18:mos>=0?10:0;
+    const dcfItems=[
+      {ok:iv>0,              text:`Intrinsic Value: $${iv.toFixed(2)}/share`},
+      {ok:mos!==null&&mos>=30,text:mos!==null?`Margin of Safety: ${mos.toFixed(1)}% (target ≥30%)`:'Margin of Safety: N/A'},
+      {ok:g>=0.08&&g<=0.20, text:`Growth Rate: ${(g*100).toFixed(1)}% (ideal 8–20%)`},
+      {ok:analystTgt>0,     text:analystTgt>0?`Analyst Target: $${analystTgt.toFixed(2)}`:'Analyst Target: N/A'},
+    ];
+
+    // ── EPS & Valuation ──
+    const epsOk=eps>0, peOk=peRatio>0&&peRatio<25, pegOk=pegRatio>0&&pegRatio<1, pbOk=pbRatio>0&&pbRatio<3;
+    const epsScore=(epsOk?4:0)+(peOk?3:0)+(pegOk?4:0)+(pbOk?2:0);
+    const epsItems=[
+      {ok:epsOk,text:`EPS (TTM): $${eps.toFixed(2)} — positive earnings required`},
+      {ok:peOk, text:`P/E Ratio: ${peRatio>0?peRatio.toFixed(1):'N/A'} (target <25)`},
+      {ok:pegOk,text:`PEG Ratio: ${pegRatio>0?pegRatio.toFixed(2):'N/A'} (under 1.0 = undervalued)`},
+      {ok:pbOk, text:`P/B Ratio: ${pbRatio>0?pbRatio.toFixed(2):'N/A'} (under 3.0 preferred)`},
+    ];
+
+    // ── Moat ──
+    const moatItems=[
+      {ok:roe>=15,      text:`ROE: ${roe.toFixed(1)}% (target ≥15%)`},
+      {ok:netMargin>=10,text:`Net Margin: ${netMargin.toFixed(1)}% (target ≥10%)`},
+      {ok:opMargin>=15, text:`Operating Margin: ${opMargin.toFixed(1)}% (target ≥15%)`},
+      {ok:revGrowth>=5, text:`Revenue Growth: ${revGrowth.toFixed(1)}% YoY (target ≥5%)`},
+    ];
+    const moatScore=moatItems.filter(i=>i.ok).length*6;
+
+    // ── Debt ──
+    const de=debtToEq>0?debtToEq:null, cr=currentR>0?currentR:null;
+    const debtItems=[
+      {ok:de!==null&&de<0.5,  text:de!==null?`Debt/Equity: ${de.toFixed(2)} (target <0.5)`:'Debt/Equity: N/A'},
+      {ok:cr!==null&&cr>=1.5, text:cr!==null?`Current Ratio: ${cr.toFixed(2)} (target ≥1.5)`:'Current Ratio: N/A'},
+      {ok:roa>=5,             text:`Return on Assets: ${roa.toFixed(1)}% (target ≥5%)`},
+      {ok:evEbitda>0&&evEbitda<15,text:evEbitda>0?`EV/EBITDA: ${evEbitda.toFixed(1)} (under 15 = good value)`:'EV/EBITDA: N/A'},
+    ];
+    const debtScore=debtItems.filter(i=>i.ok).length*6;
+
+    // ── Owner Earnings ──
+    const oeItems=[
+      {ok:netMargin>0,        text:`Net Margin: ${netMargin.toFixed(1)}% drives owner earnings`},
+      {ok:roe>=15,            text:`ROE ${roe.toFixed(1)}% = strong earnings generation`},
+      {ok:pSales>0&&pSales<3, text:pSales>0?`Price/Sales: ${pSales.toFixed(2)} (under 3.0 = reasonable)`:'Price/Sales: N/A'},
+      {ok:divYield>0,         text:divYield>0?`Dividend: ${divYield.toFixed(2)}% yield`:'No dividend paid'},
+    ];
+    const oeScore=oeItems.filter(i=>i.ok).length*6;
+
+    const total=dcfScore+epsScore+moatScore+debtScore+oeScore;
+    const maxScore=26+13+24+24+24;
+    const verdict=total>=65
+      ?{label:'Strong Buy',color:'#16a34a',bg:'#f0fdf4',border:'#bbf7d0',emoji:'🟢'}
+      :total>=45
+      ?{label:'Watch List',color:'#d97706',bg:'#fffbeb',border:'#fde68a',emoji:'🟡'}
+      :{label:'Avoid',     color:'#dc2626',bg:'#fef2f2',border:'#fecaca',emoji:'🔴'};
+
+    setStatus(`✅ ${companyName} analysis complete`,'#86efac');
+
+    const fmtCap=c=>c>=1e12?'$'+(c/1e12).toFixed(2)+'T':c>=1e9?'$'+(c/1e9).toFixed(1)+'B':'$'+(c/1e6).toFixed(0)+'M';
+    const pColor=p=>p>=70?'#22c55e':p>=40?'#f59e0b':'#f87171';
+
+    function secHtml(title,score,max,items){
+      const pct=(score/max)*100;
+      return `<div class="result-section">
+        <h3><span>${title}</span><span style="color:#9ca3af;font-weight:400">${score}/${max}</span></h3>
+        <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(pct,100)}%;background:${pColor(pct)}"></div></div>
+        ${items.map(i=>`<div class="check-item">
+          <span class="${i.ok?'check-ok':'check-no'}">${i.ok?'✓':'✗'}</span>
+          <span>${i.text}</span>
+        </div>`).join('')}
+      </div>`;
+    }
+
+    const safeName=companyName.replace(/'/g,"\\'").replace(/"/g,'\\"');
+    results.innerHTML=`
+      <div class="company-header">
+        <div>
+          <h2>${ticker}</h2>
+          <p style="font-size:13px;color:#374151;font-weight:600;margin-top:2px">${companyName}</p>
+          <p style="font-size:11px;color:#9ca3af;margin-top:2px">${sector}${industry?' · '+industry:''}</p>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:#9ca3af">52W Range</div>
+          <div style="font-size:13px;font-weight:700;color:#1f2937">$${week52Low.toFixed(0)}–$${week52High.toFixed(0)}</div>
+          ${beta>0?`<div style="font-size:11px;color:#9ca3af;margin-top:2px">Beta: ${beta.toFixed(2)}</div>`:''}
+          ${analystTgt>0?`<div style="font-size:12px;color:#16a34a;font-weight:700;margin-top:2px">🎯 $${analystTgt.toFixed(2)}</div>`:''}
+        </div>
+      </div>
+
+      <div class="verdict-card" style="background:${verdict.bg};border:1px solid ${verdict.border}">
+        <div style="font-size:52px;margin-bottom:8px">${verdict.emoji}</div>
+        <div style="font-size:28px;font-weight:900;color:${verdict.color};margin-bottom:4px">${verdict.label}</div>
+        <div style="font-size:13px;color:#6b7280;margin-bottom:16px">${companyName}</div>
+        <div class="score-box">
+          <span style="font-size:28px;font-weight:900;color:#1f2937">${total}</span>
+          <span style="font-size:14px;color:#9ca3af">/${maxScore} pts</span>
+        </div>
+        ${iv>0?`<div style="margin-top:12px;font-size:13px;color:#4b5563">
+          Intrinsic Value: <strong>$${iv.toFixed(2)}</strong>
+          ${mos!==null?`<span style="margin-left:6px;font-weight:700;color:${mos>=30?'#16a34a':mos>=0?'#d97706':'#dc2626'}">(${mos.toFixed(1)}% margin of safety)</span>`:''}
+        </div>`:''}
+        ${divYield>0?`<div style="margin-top:6px;font-size:12px;color:#6b7280">Dividend: <strong style="color:#16a34a">${divYield.toFixed(2)}%</strong></div>`:''}
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-box"><div class="mlabel">EPS (TTM)</div><div class="mvalue" style="color:${eps>0?'#16a34a':'#dc2626'}">$${eps.toFixed(2)}</div><div class="msub">Earnings/share</div></div>
+        <div class="metric-box"><div class="mlabel">PEG Ratio</div><div class="mvalue" style="color:${pegOk?'#16a34a':pegRatio>2?'#dc2626':'#d97706'}">${pegRatio>0?pegRatio.toFixed(2):'N/A'}</div><div class="msub">Under 1.0 = undervalued</div></div>
+        <div class="metric-box"><div class="mlabel">P/E Ratio</div><div class="mvalue" style="color:${peOk?'#16a34a':'#d97706'}">${peRatio>0?peRatio.toFixed(1):'N/A'}</div><div class="msub">Target: under 25</div></div>
+        <div class="metric-box"><div class="mlabel">ROE</div><div class="mvalue" style="color:${roe>=15?'#16a34a':'#dc2626'}">${roe.toFixed(1)}%</div><div class="msub">Target: ≥15%</div></div>
+        <div class="metric-box"><div class="mlabel">Net Margin</div><div class="mvalue" style="color:${netMargin>=10?'#16a34a':'#dc2626'}">${netMargin.toFixed(1)}%</div><div class="msub">Target: ≥10%</div></div>
+        <div class="metric-box"><div class="mlabel">Market Cap</div><div class="mvalue" style="font-size:15px">${fmtCap(mktCap)}</div><div class="msub">${sector||'—'}</div></div>
+      </div>
+
+      ${secHtml('📊 Intrinsic Value (DCF)',dcfScore,26,dcfItems)}
+      ${secHtml('💹 EPS & Valuation',epsScore,13,epsItems)}
+      ${secHtml('🏰 Economic Moat',moatScore,24,moatItems)}
+      ${secHtml('💰 Debt & Financial Health',debtScore,24,debtItems)}
+      ${secHtml('🔑 Owner Earnings',oeScore,24,oeItems)}
+
+      <div class="quote-box">
+        <p>"Price is what you pay. Value is what you get."</p>
+        <span>— Warren Buffett</span>
+      </div>
+
+      <button class="btn-save" onclick="saveStock('${ticker}','${safeName}',${total},${iv.toFixed(2)},${mos!==null?mos.toFixed(1):0},'${verdict.label}','${verdict.color}','${verdict.emoji}',${maxScore})">
+        💾 Save to Watchlist
+      </button>
+      <button class="btn-reset" onclick="resetApp()">🔄 Analyze Another Stock</button>
+      <p class="disclaimer">⚠️ Educational use only. Not financial advice. Data: Alpha Vantage.</p>
+    `;
+
+  } catch(err){
+    setStatus('❌ '+err.message.substring(0,50),'#fca5a5');
+    results.innerHTML=`<div class="error-box" style="margin-top:16px">
+      <h3>❌ Error</h3>
+      <p style="margin-bottom:12px">${err.message}</p>
+      <p style="font-size:12px"><strong>Examples:</strong> AAPL · MSFT · KO · JNJ · WMT · GOOGL</p>
+      <button onclick="analyzeStock()" style="margin-top:12px;padding:10px 24px;background:#dc2626;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">🔄 Retry</button>
+    </div>`;
+  }
+}
+
+// ── Watchlist ──
+function renderWatchlist(){
+  const el=document.getElementById('watchlistView');
+  if(watchlist.length===0){
+    el.innerHTML=`<div class="welcome">
+      <div style="font-size:48px;margin-bottom:12px">📋</div>
+      <div style="font-size:16px;font-weight:700;color:#374151;margin-bottom:6px">Watchlist Empty</div>
+      <div style="font-size:13px;color:#6b7280">Analyze a stock and tap<br/>"Save to Watchlist"</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML=`
+    <div class="watchlist-card">
+      <div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:12px">📋 My Watchlist (${watchlist.length})</div>
+      ${watchlist.map((s,i)=>`
+        <div class="watchlist-item">
+          <div style="flex:1;cursor:pointer" onclick="loadFromWatchlist('${s.ticker}')">
+            <div style="font-size:14px;font-weight:700;color:#1f2937">${s.emoji} ${s.ticker} <span style="font-weight:400;color:#6b7280;font-size:12px">${s.name.length>20?s.name.substring(0,20)+'...':s.name}</span></div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:2px">${s.date} · IV: $${s.iv}</div>
+          </div>
+          <div style="text-align:right;margin-right:12px">
+            <div style="font-size:16px;font-weight:900;color:${s.color}">${s.score}/${s.max}</div>
+            <div style="font-size:11px;color:${s.color};font-weight:600">${s.label}</div>
+          </div>
+          <button onclick="removeFromWatchlist(${i})" style="background:none;border:none;color:#f87171;font-size:18px;cursor:pointer;padding:4px">✕</button>
+        </div>`).join('')}
+    </div>
+    <p class="disclaimer">Tap any stock to re-analyze it</p>`;
+}
+
+function loadFromWatchlist(ticker){
+  document.getElementById('tickerInput').value=ticker;
+  showPage('analyze');
+  analyzeStock();
+}
+
+function removeFromWatchlist(i){
+  watchlist.splice(i,1);
+  localStorage.setItem('buffett_wl',JSON.stringify(watchlist));
+  renderWatchlist();
+}
+
+function saveStock(ticker,name,score,iv,mos,label,color,emoji,max){
+  try{
+    const entry={ticker,name,score,iv,mos,label,color,emoji,max,date:new Date().toLocaleDateString()};
+    watchlist=[entry,...watchlist.filter(s=>s.ticker!==ticker)].slice(0,20);
+    localStorage.setItem('buffett_wl',JSON.stringify(watchlist));
+    alert(`✅ ${ticker} saved to watchlist!`);
+  }catch(e){ alert('Could not save'); }
+}
+
+function resetApp(){
+  document.getElementById('tickerInput').value='';
+  setStatus('🟢 Ready — Enter a US stock ticker','#93c5fd');
+  document.getElementById('results').innerHTML=`<div class="welcome">
+    <div style="font-size:56px;margin-bottom:12px">📈</div>
+    <div style="font-size:17px;font-weight:700;color:#374151;margin-bottom:8px">Ready to Analyze</div>
+    <div style="font-size:13px;color:#6b7280;line-height:2">
+      <strong>AAPL</strong> · <strong>MSFT</strong> · <strong>KO</strong> · <strong>JNJ</strong> · <strong>WMT</strong>
+    </div>
+  </div>`;
+}
+</script>
+</body>
+</html>
