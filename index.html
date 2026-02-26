@@ -12,25 +12,27 @@
 <title>Buffett Value Evaluator</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-tap-highlight-color:transparent}
-body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;min-height:-webkit-fill-available;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-.header{background:linear-gradient(135deg,#92400e,#d97706);color:white;padding:16px 16px 24px;padding-top:calc(16px + env(safe-area-inset-top))}
-.header h1{font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px}
+body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.header{background:linear-gradient(135deg,#92400e,#d97706);color:white;padding:16px 16px 20px;padding-top:calc(16px + env(safe-area-inset-top))}
+.header h1{font-size:20px;font-weight:800}
 .header p{font-size:12px;color:#fde68a;margin-top:3px}
 .search-row{display:flex;gap:8px;margin-top:12px}
 .search-row input{flex:1;border:none;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:700;font-family:monospace;color:#1f2937;outline:none;text-transform:uppercase;-webkit-appearance:none}
-.search-row button{background:#1f2937;color:white;border:none;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:700;cursor:pointer;-webkit-appearance:none}
+.search-row button{background:#1f2937;color:white;border:none;border-radius:12px;padding:12px 18px;font-size:18px;font-weight:700;cursor:pointer}
 .status-bar{font-size:11px;padding:5px 16px;text-align:center;background:#1e3a5f;color:#93c5fd}
 .quota-bar{background:#1c1c1e;color:#fde68a;font-size:11px;padding:5px 16px;text-align:center}
 .container{max-width:480px;margin:0 auto;padding:0 16px 100px}
-.loading{text-align:center;padding:60px 20px}
+.loading{text-align:center;padding:50px 20px}
 .spinner{width:48px;height:48px;border:4px solid #fde68a;border-top-color:#d97706;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading p{color:#92400e;font-weight:600;font-size:14px;margin-top:8px}
+.loading .step{font-size:12px;color:#9ca3af;margin-top:6px}
 .error-box{background:#fef2f2;border:1px solid #fecaca;border-radius:14px;padding:20px;margin-top:16px;text-align:center}
 .error-box h3{font-size:16px;color:#dc2626;margin-bottom:8px}
 .error-box p{font-size:13px;color:#4b5563;line-height:1.6}
+.card{background:white;border-radius:14px;border:1px solid #f3f4f6;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:12px}
+.card-title{font-size:14px;font-weight:700;color:#374151;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 .company-header{background:white;border-radius:14px;border:1px solid #f3f4f6;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin:16px 0 12px;display:flex;justify-content:space-between;align-items:flex-start}
-.company-header h2{font-size:18px;font-weight:800;color:#1f2937}
 .up{color:#16a34a}.down{color:#dc2626}
 .verdict-card{border-radius:16px;padding:24px;text-align:center;margin-bottom:12px}
 .score-box{background:white;border-radius:10px;padding:8px 24px;display:inline-block;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
@@ -46,6 +48,34 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;min-hei
 .check-item{font-size:12px;color:#4b5563;display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;line-height:1.4}
 .check-ok{color:#22c55e;font-weight:700;flex-shrink:0}
 .check-no{color:#f87171;font-weight:700;flex-shrink:0}
+/* DCF Breakdown */
+.dcf-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-top:10px}
+.dcf-box h4{font-size:12px;font-weight:700;color:#374151;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em}
+.dcf-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:12px}
+.dcf-row:last-child{border-bottom:none;font-weight:700;color:#1f2937;padding-top:8px;margin-top:4px;border-top:2px solid #e2e8f0}
+.dcf-label{color:#6b7280}
+.dcf-value{font-weight:600;color:#1f2937;font-family:monospace}
+.dcf-formula{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px;margin-top:10px;font-size:11px;color:#92400e;line-height:1.7}
+.dcf-formula strong{color:#92400e}
+/* News */
+.news-item{padding:12px 0;border-bottom:1px solid #f3f4f6}
+.news-item:last-child{border-bottom:none}
+.news-headline{font-size:13px;font-weight:600;color:#1f2937;line-height:1.4;margin-bottom:4px}
+.news-meta{font-size:11px;color:#9ca3af;display:flex;gap:8px;align-items:center}
+.news-sentiment{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px}
+.sent-positive{background:#dcfce7;color:#16a34a}
+.sent-negative{background:#fef2f2;color:#dc2626}
+.sent-neutral{background:#f3f4f6;color:#6b7280}
+/* Comparison Table */
+.comp-table{width:100%;border-collapse:collapse;font-size:12px}
+.comp-table th{background:#f8fafc;padding:8px 6px;text-align:left;font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;border-bottom:2px solid #e5e7eb}
+.comp-table td{padding:8px 6px;border-bottom:1px solid #f3f4f6;color:#374151}
+.comp-table tr:last-child td{border-bottom:none}
+.comp-table .highlight{background:#fffbeb;font-weight:700}
+.comp-table .best{color:#16a34a;font-weight:700}
+.comp-table .worst{color:#dc2626}
+.comp-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:99px;background:#fef3c7;color:#d97706;margin-left:4px}
+/* Quote */
 .quote-box{background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:16px;margin-bottom:12px;text-align:center}
 .quote-box p{font-size:12px;color:#92400e;font-style:italic;line-height:1.6}
 .quote-box span{font-size:11px;color:#d97706;margin-top:6px;display:block}
@@ -56,22 +86,24 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;min-hei
 .watchlist-item:last-child{border-bottom:none}
 .disclaimer{font-size:10px;color:#9ca3af;text-align:center;padding:8px 0 16px;line-height:1.5}
 .welcome{text-align:center;padding:40px 20px 20px}
-.install-banner{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:white;border-radius:14px;padding:16px;margin-top:16px;display:none}
-.install-banner h3{font-size:14px;font-weight:700;margin-bottom:6px}
-.install-banner p{font-size:12px;opacity:0.9;line-height:1.6}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #f3f4f6;padding:8px 0;padding-bottom:calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;box-shadow:0 -2px 10px rgba(0,0,0,0.08);z-index:100}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:4px 0}
 .nav-btn span:first-child{font-size:22px}
 .nav-btn span:last-child{font-size:10px;font-weight:600;color:#9ca3af}
 .nav-btn.active span:last-child{color:#d97706}
 .page{display:none}.page.active{display:block}
+.collapsible{cursor:pointer;user-select:none}
+.collapsible:after{content:' ▼';font-size:10px;color:#9ca3af}
+.collapsible.open:after{content:' ▲';font-size:10px;color:#9ca3af}
+.collapse-content{display:none}
+.collapse-content.open{display:block}
 </style>
 </head>
 <body>
 
 <div class="header">
   <h1>🧓 Buffett Evaluator</h1>
-  <p>Warren Buffett-style stock analysis</p>
+  <p>Real-time value investing analysis</p>
   <div class="search-row">
     <input type="text" id="tickerInput" placeholder="AAPL, MSFT, KO..." maxlength="10" autocomplete="off" autocorrect="off" spellcheck="false"/>
     <button onclick="analyzeStock()">🔍</button>
@@ -79,51 +111,49 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;min-hei
 </div>
 
 <div class="status-bar" id="statusBar">🟢 Ready — Enter a US stock ticker</div>
-<div class="quota-bar" id="quotaBar">📊 Loading quota info...</div>
+<div class="quota-bar" id="quotaBar">📊 Loading...</div>
 
 <div class="container">
-  <!-- Analyze Page -->
   <div class="page active" id="page-analyze">
     <div id="results">
       <div class="welcome">
         <div style="font-size:56px;margin-bottom:12px">📈</div>
         <div style="font-size:17px;font-weight:700;color:#374151;margin-bottom:8px">Ready to Analyze</div>
-        <div style="font-size:13px;color:#6b7280;line-height:2">
+        <div style="font-size:13px;color:#6b7280;line-height:2.2">
           <strong>AAPL</strong> · <strong>MSFT</strong> · <strong>KO</strong> · <strong>JNJ</strong> · <strong>WMT</strong>
         </div>
-        <div id="installBanner" class="install-banner">
-          <h3>📱 Install as iPhone App</h3>
-          <p>Tap <strong>Share ↑</strong> in Safari then<br/><strong>"Add to Home Screen"</strong><br/>to use this as a real app!</p>
+        <div style="margin-top:16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;text-align:left;font-size:12px;color:#166534;line-height:1.8">
+          ✨ <strong>New features:</strong><br/>
+          📐 Full DCF calculation breakdown<br/>
+          📰 Latest company news & sentiment<br/>
+          📊 Competitor comparison table
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Watchlist Page -->
   <div class="page" id="page-watchlist">
     <div style="padding-top:16px" id="watchlistView"></div>
   </div>
 
-  <!-- Settings Page -->
   <div class="page" id="page-settings">
     <div style="padding-top:16px">
       <div class="watchlist-card">
         <div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:16px">⚙️ Settings</div>
         <div style="font-size:13px;color:#4b5563;margin-bottom:8px;font-weight:600">Alpha Vantage API Key</div>
-        <input id="apiKeyInput" type="text" value="8CWC4MJFBVMYX2FN"
+        <input id="apiKeyInput" type="text" value=""
           style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;font-size:13px;font-family:monospace;outline:none;margin-bottom:10px"/>
         <button onclick="saveApiKey()" style="width:100%;padding:11px;background:#d97706;color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer">
           💾 Save API Key
         </button>
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f3f4f6">
-          <div style="font-size:13px;color:#4b5563;margin-bottom:8px;font-weight:600">API Usage Today</div>
+          <div style="font-size:13px;color:#4b5563;margin-bottom:6px;font-weight:600">API Usage Today</div>
           <div id="settingsQuota" style="font-size:13px;color:#6b7280"></div>
         </div>
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f3f4f6">
-          <div style="font-size:13px;color:#4b5563;margin-bottom:8px;font-weight:600">Get More API Calls</div>
-          <div style="font-size:12px;color:#6b7280;line-height:1.6">Free tier: 25 calls/day<br/>
-          Get a second free key at:<br/>
-          <strong style="color:#d97706">alphavantage.co/support/#api-key</strong></div>
+          <div style="font-size:13px;color:#4b5563;margin-bottom:6px;font-weight:600">💡 Get More API Calls</div>
+          <div style="font-size:12px;color:#6b7280;line-height:1.8">Free tier: 25 calls/day<br/>
+          Get a 2nd free key at:<br/><strong style="color:#d97706">alphavantage.co/support/#api-key</strong></div>
         </div>
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f3f4f6">
           <button onclick="clearWatchlist()" style="width:100%;padding:11px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer">
@@ -132,21 +162,18 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;min-hei
         </div>
       </div>
       <div class="watchlist-card">
-        <div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:12px">📱 Install as iPhone App</div>
+        <div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:12px">📱 Add to Home Screen</div>
         <div style="font-size:13px;color:#4b5563;line-height:1.8">
-          1. Open this page in <strong>Safari</strong><br/>
-          2. Tap the <strong>Share ↑</strong> button<br/>
+          1. Open in <strong>Safari</strong><br/>
+          2. Tap <strong>Share ↑</strong> button<br/>
           3. Tap <strong>"Add to Home Screen"</strong><br/>
-          4. Tap <strong>"Add"</strong> — done! 🎉<br/><br/>
-          The app will appear on your home screen and run full screen with no browser bar!
+          4. Tap <strong>"Add"</strong> ✅
         </div>
       </div>
-      <p class="disclaimer">⚠️ For educational purposes only. Not financial advice. Always do your own research before investing.</p>
     </div>
   </div>
 </div>
 
-<!-- Bottom Navigation -->
 <div class="bottom-nav">
   <button class="nav-btn active" id="nav-analyze" onclick="showPage('analyze')">
     <span>🔍</span><span>Analyze</span>
@@ -160,53 +187,62 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;min-hei
 </div>
 
 <script>
-// ── State ──
 let AV_KEY = localStorage.getItem('av_key') || '8CWC4MJFBVMYX2FN';
 let watchlist = [];
 let callsToday = 0;
+
+// Competitor map by sector
+const COMPETITORS = {
+  'Technology': ['AAPL','MSFT','GOOGL','META','AMZN'],
+  'Consumer Discretionary': ['AMZN','TGT','COST','WMT','HD'],
+  'Consumer Staples': ['KO','PEP','PG','JNJ','WMT'],
+  'Health Care': ['JNJ','PFE','MRK','ABBV','UNH'],
+  'Financials': ['JPM','BAC','WFC','GS','MS'],
+  'Energy': ['XOM','CVX','COP','SLB','EOG'],
+  'Industrials': ['BA','CAT','GE','HON','MMM'],
+  'Communication Services': ['GOOGL','META','NFLX','DIS','T'],
+  'Utilities': ['NEE','DUK','SO','AEP','EXC'],
+  'Real Estate': ['AMT','PLD','CCI','EQIX','SPG'],
+  'Materials': ['LIN','APD','SHW','FCX','NEM'],
+};
 
 try {
   watchlist = JSON.parse(localStorage.getItem('buffett_wl') || '[]');
   const today = new Date().toDateString();
   const saved = JSON.parse(localStorage.getItem('av_quota') || '{"date":"","calls":0}');
   if(saved.date === today) callsToday = saved.calls;
-  else { callsToday = 0; saveQuota(); }
+  else { callsToday = 0; }
 } catch(e){}
 
-// ── Register Service Worker ──
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 
-// ── Show install banner in Safari ──
-const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-const isStandalone = window.navigator.standalone;
-if(isIOS && !isStandalone){
-  document.getElementById('installBanner').style.display = 'block';
-}
-
-// ── Quota ──
 function saveQuota(){
   localStorage.setItem('av_quota', JSON.stringify({date:new Date().toDateString(), calls:callsToday}));
   const rem = 25 - callsToday;
-  document.getElementById('quotaBar').textContent = `📊 API calls today: ${callsToday}/25  (${rem} remaining)`;
+  document.getElementById('quotaBar').textContent = `📊 API calls: ${callsToday}/25 used  (${rem} remaining today)`;
   document.getElementById('settingsQuota').textContent = `${callsToday} used · ${rem} remaining today`;
 }
 saveQuota();
 
-// ── Navigation ──
+function setStatus(msg, color='#93c5fd'){
+  const b=document.getElementById('statusBar');
+  b.textContent=msg; b.style.color=color;
+}
+
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   document.getElementById('nav-'+name).classList.add('active');
   if(name==='watchlist') renderWatchlist();
-  if(name==='settings') document.getElementById('apiKeyInput').value = AV_KEY;
+  if(name==='settings'){ document.getElementById('apiKeyInput').value=AV_KEY; saveQuota(); }
 }
 
 function saveApiKey(){
-  AV_KEY = document.getElementById('apiKeyInput').value.trim();
-  localStorage.setItem('av_key', AV_KEY);
+  AV_KEY=document.getElementById('apiKeyInput').value.trim();
+  localStorage.setItem('av_key',AV_KEY);
   alert('✅ API key saved!');
 }
 
@@ -219,27 +255,39 @@ function clearWatchlist(){
   }
 }
 
-// ── Input ──
 document.getElementById('tickerInput').addEventListener('keypress', e=>{
   if(e.key==='Enter') analyzeStock();
 });
 
-// ── Status ──
-function setStatus(msg, color='#93c5fd'){
-  const b=document.getElementById('statusBar');
-  b.textContent=msg; b.style.color=color;
+function toggleSection(id){
+  const el=document.getElementById(id);
+  const btn=document.getElementById('btn-'+id);
+  if(el.classList.contains('open')){
+    el.classList.remove('open');
+    btn.classList.remove('open');
+  } else {
+    el.classList.add('open');
+    btn.classList.add('open');
+  }
 }
 
-// ── Fetch ──
+async function avFetch(fn, params){
+  const url=`https://www.alphavantage.co/query?function=${fn}&${params}&apikey=${AV_KEY}`;
+  const res=await fetch(url);
+  if(!res.ok) throw new Error(`Network error ${res.status}`);
+  const data=await res.json();
+  if(data['Note']) throw new Error('Rate limit hit. Wait 1 minute and retry.');
+  if(data['Information']) throw new Error('Daily limit reached (25/day). Come back tomorrow!');
+  return data;
+}
+
 async function analyzeStock(){
-  const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+  const ticker=document.getElementById('tickerInput').value.trim().toUpperCase();
   if(!ticker){ alert('Please enter a stock ticker'); return; }
-  if(callsToday>=24){
+  if(callsToday>=23){
     document.getElementById('results').innerHTML=`<div class="error-box" style="margin-top:16px">
-      <h3>⏰ Daily Limit Reached</h3>
-      <p>You've used all 25 free API calls today.<br/><br/>
-      <strong>Resets at midnight US Eastern time.</strong><br/><br/>
-      💡 Get a second free key at:<br/><strong>alphavantage.co/support/#api-key</strong></p>
+      <h3>⏰ Daily Limit Almost Reached</h3>
+      <p>Only ${25-callsToday} API calls remaining today.<br/>Come back tomorrow or add a new API key in Settings.</p>
     </div>`;
     return;
   }
@@ -248,25 +296,47 @@ async function analyzeStock(){
   const results=document.getElementById('results');
   results.innerHTML=`<div class="loading">
     <div class="spinner"></div>
-    <p>Analyzing <strong>${ticker}</strong>...</p>
-    <p style="font-size:11px;color:#9ca3af;margin-top:8px">${25-callsToday} API calls remaining today</p>
+    <p>Analyzing <strong>${ticker}</strong></p>
+    <div class="step" id="loadStep">Fetching company overview...</div>
   </div>`;
   setStatus(`⏳ Loading ${ticker}...`,'#fde68a');
 
-  try{
-    const url=`https://www.alphavantage.co/query?function=OVERVIEW&symbol=${ticker}&apikey=${AV_KEY}`;
-    const res=await fetch(url);
-    if(!res.ok) throw new Error(`Network error ${res.status}`);
-    const ov=await res.json();
-    callsToday++; saveQuota();
+  function setStep(msg){ const s=document.getElementById('loadStep'); if(s) s.textContent=msg; }
 
-    if(ov['Note']) throw new Error('Rate limit hit. Wait 1 minute and retry.');
-    if(ov['Information']) throw new Error('Daily limit reached (25/day). Come back tomorrow!');
-    if(!ov['Name']) throw new Error(`"${ticker}" not found. Check the symbol — e.g. AAPL, MSFT, KO`);
+  try{
+    // ── Call 1: Overview ──
+    setStep('📊 Fetching company data... (1/3)');
+    const ov = await avFetch('OVERVIEW', `symbol=${ticker}`);
+    callsToday++; saveQuota();
+    if(!ov['Name']) throw new Error(`"${ticker}" not found. Try: AAPL, MSFT, KO, JNJ, WMT`);
+
+    // ── Call 2: News ──
+    setStep('📰 Fetching latest news... (2/3)');
+    let newsItems = [];
+    try{
+      const newsData = await avFetch('NEWS_SENTIMENT', `tickers=${ticker}&limit=5`);
+      callsToday++; saveQuota();
+      newsItems = newsData?.feed?.slice(0,5) || [];
+    } catch(e){ /* news optional */ }
+
+    // ── Call 3: Competitors (fetch 2 competitors) ──
+    setStep('📊 Fetching competitor data... (3/3)');
+    const sector = ov['Sector'] || 'Technology';
+    const allComps = (COMPETITORS[sector] || COMPETITORS['Technology']).filter(t=>t!==ticker).slice(0,2);
+    let compData = [];
+    for(const comp of allComps){
+      if(callsToday >= 24) break;
+      try{
+        const cd = await avFetch('OVERVIEW', `symbol=${comp}`);
+        callsToday++; saveQuota();
+        if(cd['Name']) compData.push({ticker:comp, data:cd});
+      } catch(e){}
+    }
 
     const n=v=>parseFloat(v)||0;
+
+    // ── Parse main stock ──
     const companyName = ov['Name']||ticker;
-    const sector      = ov['Sector']||'';
     const industry    = ov['Industry']||'';
     const mktCap      = n(ov['MarketCapitalization']);
     const eps         = n(ov['EPS']);
@@ -290,25 +360,36 @@ async function analyzeStock(){
     const evEbitda    = n(ov['EVToEBITDA']);
     const debtToEq    = n(ov['DebtToEquity'])/100;
     const currentR    = n(ov['CurrentRatio']);
-    const sharesOut   = n(ov['SharesOutstanding']);
-    const revPerShare = n(ov['RevenuePerShareTTM']);
 
-    // ── DCF ──
-    const g=Math.min(Math.max(earningsG>0?earningsG/100:revGrowth>0?revGrowth/100:0.08,0.03),0.25);
-    const tg=0.03,dr=0.10,yrs=10;
-    let iv=0;
-    if(eps>0){
-      let cf=eps;
-      for(let i=1;i<=yrs;i++){cf*=(1+g);iv+=cf/Math.pow(1+dr,i);}
-      iv+=(cf*(1+tg)/(dr-tg))/Math.pow(1+dr,yrs);
+    setStep('🧮 Calculating intrinsic value...');
+
+    // ── DCF Intrinsic Value (detailed) ──
+    const g   = Math.min(Math.max(earningsG>0?earningsG/100:revGrowth>0?revGrowth/100:0.08, 0.03), 0.25);
+    const tg  = 0.03, dr = 0.10, yrs = 10;
+    let iv = 0;
+    const dcfYears = [];
+    if(eps > 0){
+      let cf = eps;
+      let pvSum = 0;
+      for(let i=1;i<=yrs;i++){
+        cf *= (1+g);
+        const pv = cf / Math.pow(1+dr, i);
+        pvSum += pv;
+        dcfYears.push({year:i, eps:cf.toFixed(2), pv:pv.toFixed(2)});
+      }
+      const terminalValue = (cf*(1+tg)/(dr-tg));
+      const pvTerminal = terminalValue / Math.pow(1+dr, yrs);
+      iv = pvSum + pvTerminal;
+      dcfYears.push({year:'Terminal', eps:terminalValue.toFixed(0), pv:pvTerminal.toFixed(2)});
     }
-    const refPrice=analystTgt>0?analystTgt*0.95:pbRatio>0&&bookValue>0?pbRatio*bookValue:0;
-    const mos=refPrice>0&&iv>0?((iv-refPrice)/iv)*100:null;
-    const dcfScore=mos===null?0:mos>=30?25:mos>=10?18:mos>=0?10:0;
-    const dcfItems=[
+
+    const refPrice = analystTgt>0 ? analystTgt*0.95 : pbRatio>0&&bookValue>0 ? pbRatio*bookValue : 0;
+    const mos = refPrice>0&&iv>0 ? ((iv-refPrice)/iv)*100 : null;
+    const dcfScore = mos===null?0:mos>=30?25:mos>=10?18:mos>=0?10:0;
+    const dcfItems = [
       {ok:iv>0,              text:`Intrinsic Value: $${iv.toFixed(2)}/share`},
       {ok:mos!==null&&mos>=30,text:mos!==null?`Margin of Safety: ${mos.toFixed(1)}% (target ≥30%)`:'Margin of Safety: N/A'},
-      {ok:g>=0.08&&g<=0.20, text:`Growth Rate: ${(g*100).toFixed(1)}% (ideal 8–20%)`},
+      {ok:g>=0.08&&g<=0.20, text:`Growth Rate: ${(g*100).toFixed(1)}% used (ideal 8–20%)`},
       {ok:analystTgt>0,     text:analystTgt>0?`Analyst Target: $${analystTgt.toFixed(2)}`:'Analyst Target: N/A'},
     ];
 
@@ -337,22 +418,22 @@ async function analyzeStock(){
       {ok:de!==null&&de<0.5,  text:de!==null?`Debt/Equity: ${de.toFixed(2)} (target <0.5)`:'Debt/Equity: N/A'},
       {ok:cr!==null&&cr>=1.5, text:cr!==null?`Current Ratio: ${cr.toFixed(2)} (target ≥1.5)`:'Current Ratio: N/A'},
       {ok:roa>=5,             text:`Return on Assets: ${roa.toFixed(1)}% (target ≥5%)`},
-      {ok:evEbitda>0&&evEbitda<15,text:evEbitda>0?`EV/EBITDA: ${evEbitda.toFixed(1)} (under 15 = good value)`:'EV/EBITDA: N/A'},
+      {ok:evEbitda>0&&evEbitda<15,text:evEbitda>0?`EV/EBITDA: ${evEbitda.toFixed(1)} (under 15 = good)`:'EV/EBITDA: N/A'},
     ];
     const debtScore=debtItems.filter(i=>i.ok).length*6;
 
     // ── Owner Earnings ──
     const oeItems=[
-      {ok:netMargin>0,        text:`Net Margin: ${netMargin.toFixed(1)}% drives owner earnings`},
+      {ok:netMargin>0,        text:`Net Margin: ${netMargin.toFixed(1)}% (higher = more owner earnings)`},
       {ok:roe>=15,            text:`ROE ${roe.toFixed(1)}% = strong earnings generation`},
       {ok:pSales>0&&pSales<3, text:pSales>0?`Price/Sales: ${pSales.toFixed(2)} (under 3.0 = reasonable)`:'Price/Sales: N/A'},
-      {ok:divYield>0,         text:divYield>0?`Dividend: ${divYield.toFixed(2)}% yield`:'No dividend paid'},
+      {ok:divYield>0,         text:divYield>0?`Dividend Yield: ${divYield.toFixed(2)}%`:'No dividend paid'},
     ];
     const oeScore=oeItems.filter(i=>i.ok).length*6;
 
-    const total=dcfScore+epsScore+moatScore+debtScore+oeScore;
-    const maxScore=26+13+24+24+24;
-    const verdict=total>=65
+    const total    = dcfScore+epsScore+moatScore+debtScore+oeScore;
+    const maxScore = 26+13+24+24+24;
+    const verdict  = total>=65
       ?{label:'Strong Buy',color:'#16a34a',bg:'#f0fdf4',border:'#bbf7d0',emoji:'🟢'}
       :total>=45
       ?{label:'Watch List',color:'#d97706',bg:'#fffbeb',border:'#fde68a',emoji:'🟡'}
@@ -375,8 +456,97 @@ async function analyzeStock(){
       </div>`;
     }
 
+    // ── DCF Breakdown HTML ──
+    const dcfBreakdownHtml = eps>0 ? `
+      <div class="dcf-box">
+        <h4>📐 DCF Calculation Inputs</h4>
+        <div class="dcf-row"><span class="dcf-label">Current EPS</span><span class="dcf-value">$${eps.toFixed(2)}</span></div>
+        <div class="dcf-row"><span class="dcf-label">Growth Rate (g)</span><span class="dcf-value">${(g*100).toFixed(1)}% per year</span></div>
+        <div class="dcf-row"><span class="dcf-label">Discount Rate (r)</span><span class="dcf-value">${(dr*100).toFixed(0)}% (required return)</span></div>
+        <div class="dcf-row"><span class="dcf-label">Terminal Growth</span><span class="dcf-value">${(tg*100).toFixed(0)}% (after year ${yrs})</span></div>
+        <div class="dcf-row"><span class="dcf-label">Projection Period</span><span class="dcf-value">${yrs} years</span></div>
+      </div>
+      <div class="dcf-formula">
+        <strong>Formula:</strong><br/>
+        IV = Σ [EPS × (1+g)ⁿ / (1+r)ⁿ] + Terminal Value<br/><br/>
+        <strong>Year-by-Year Projected EPS vs Present Value:</strong><br/>
+        ${dcfYears.slice(0,5).map(y=>`Yr ${y.year}: EPS=$${y.eps} → PV=$${y.pv}`).join('<br/>')}
+        <br/>...<br/>
+        ${dcfYears.slice(-1).map(y=>`Terminal Value → PV=$${y.pv}`).join('')}<br/><br/>
+        <strong>Intrinsic Value = $${iv.toFixed(2)}/share</strong>
+        ${mos!==null?`<br/><strong>Margin of Safety = ${mos.toFixed(1)}%</strong>`:''}
+      </div>` : `<div class="dcf-formula">⚠️ DCF requires positive EPS. ${ticker} has EPS: $${eps.toFixed(2)}</div>`;
+
+    // ── News HTML ──
+    const newsHtml = newsItems.length>0 ? newsItems.map(item=>{
+      const sentiment = item.overall_sentiment_label || 'Neutral';
+      const sentClass = sentiment.toLowerCase().includes('bull')||sentiment.toLowerCase().includes('positive') ? 'sent-positive'
+        : sentiment.toLowerCase().includes('bear')||sentiment.toLowerCase().includes('negative') ? 'sent-negative'
+        : 'sent-neutral';
+      const sentEmoji = sentClass==='sent-positive'?'📈':sentClass==='sent-negative'?'📉':'➡️';
+      const timeAgo = item.time_published ? item.time_published.substring(0,8) : '';
+      const date = timeAgo ? `${timeAgo.substring(0,4)}-${timeAgo.substring(4,6)}-${timeAgo.substring(6,8)}` : '';
+      return `<div class="news-item">
+        <div class="news-headline">${item.title||'No title'}</div>
+        <div class="news-meta">
+          <span class="news-sentiment ${sentClass}">${sentEmoji} ${sentiment}</span>
+          <span>${item.source||''}</span>
+          <span>${date}</span>
+        </div>
+      </div>`;
+    }).join('') : '<div style="font-size:13px;color:#9ca3af;padding:12px 0;text-align:center">No recent news available</div>';
+
+    // ── Competitor Table HTML ──
+    const allStocks = [{ticker, data:ov}, ...compData];
+    const metrics = [
+      {key:'PERatio',   label:'P/E',    fmt:v=>n(v)>0?n(v).toFixed(1):'N/A', better:'lower'},
+      {key:'PEGRatio',  label:'PEG',    fmt:v=>n(v)>0?n(v).toFixed(2):'N/A', better:'lower'},
+      {key:'PriceToBookRatio',label:'P/B', fmt:v=>n(v)>0?n(v).toFixed(2):'N/A', better:'lower'},
+      {key:'ProfitMargin',label:'Net Margin',fmt:v=>(n(v)*100).toFixed(1)+'%', better:'higher'},
+      {key:'ReturnOnEquityTTM',label:'ROE',fmt:v=>(n(v)*100).toFixed(1)+'%', better:'higher'},
+      {key:'EPS',       label:'EPS',    fmt:v=>'$'+n(v).toFixed(2), better:'higher'},
+      {key:'DividendYield',label:'Div Yield',fmt:v=>(n(v)*100).toFixed(2)+'%', better:'higher'},
+      {key:'DebtToEquity',label:'Debt/Eq',fmt:v=>n(v)>0?(n(v)/100).toFixed(2):'N/A', better:'lower'},
+    ];
+
+    function getBestIdx(metricKey, better){
+      const vals = allStocks.map(s=>n(s.data[metricKey]));
+      const valid = vals.filter(v=>v>0);
+      if(valid.length===0) return -1;
+      const best = better==='lower' ? Math.min(...valid) : Math.max(...valid);
+      return vals.indexOf(best);
+    }
+
+    const compTableHtml = `
+      <div style="overflow-x:auto">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              ${allStocks.map((s,i)=>`<th style="${i===0?'color:#d97706':''}">${s.ticker}${i===0?'<span class="comp-badge">YOU</span>':''}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${metrics.map(m=>{
+              const bestIdx = getBestIdx(m.key, m.better);
+              return `<tr>
+                <td style="font-weight:600;color:#374151">${m.label}</td>
+                ${allStocks.map((s,i)=>{
+                  const val = m.fmt(s.data[m.key]);
+                  const isBest = i===bestIdx;
+                  const isMain = i===0;
+                  return `<td class="${isMain?'highlight':''} ${isBest?'best':''}">${val}${isBest?' 🏆':''}</td>`;
+                }).join('')}
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:10px;color:#9ca3af;margin-top:8px">🏆 = best value among compared stocks</div>`;
+
     const safeName=companyName.replace(/'/g,"\\'").replace(/"/g,'\\"');
-    results.innerHTML=`
+
+    results.innerHTML = `
       <div class="company-header">
         <div>
           <h2>${ticker}</h2>
@@ -416,10 +586,36 @@ async function analyzeStock(){
       </div>
 
       ${secHtml('📊 Intrinsic Value (DCF)',dcfScore,26,dcfItems)}
+
+      <!-- DCF Breakdown (collapsible) -->
+      <div class="result-section">
+        <h3 class="collapsible" id="btn-dcf-detail" onclick="toggleSection('dcf-detail')">📐 DCF Calculation Breakdown</h3>
+        <div class="collapse-content open" id="dcf-detail">
+          ${dcfBreakdownHtml}
+        </div>
+      </div>
+
       ${secHtml('💹 EPS & Valuation',epsScore,13,epsItems)}
       ${secHtml('🏰 Economic Moat',moatScore,24,moatItems)}
       ${secHtml('💰 Debt & Financial Health',debtScore,24,debtItems)}
       ${secHtml('🔑 Owner Earnings',oeScore,24,oeItems)}
+
+      <!-- Competitor Comparison -->
+      <div class="result-section">
+        <h3 class="collapsible open" id="btn-comp" onclick="toggleSection('comp')">📊 Competitor Comparison</h3>
+        <div class="collapse-content open" id="comp">
+          <div style="font-size:11px;color:#9ca3af;margin-bottom:10px">vs ${allStocks.slice(1).map(s=>s.ticker).join(', ')} in ${sector}</div>
+          ${compTableHtml}
+        </div>
+      </div>
+
+      <!-- Latest News -->
+      <div class="result-section">
+        <h3 class="collapsible open" id="btn-news" onclick="toggleSection('news')">📰 Latest News & Sentiment</h3>
+        <div class="collapse-content open" id="news">
+          ${newsHtml}
+        </div>
+      </div>
 
       <div class="quote-box">
         <p>"Price is what you pay. Value is what you get."</p>
@@ -430,7 +626,7 @@ async function analyzeStock(){
         💾 Save to Watchlist
       </button>
       <button class="btn-reset" onclick="resetApp()">🔄 Analyze Another Stock</button>
-      <p class="disclaimer">⚠️ Educational use only. Not financial advice. Data: Alpha Vantage.</p>
+      <p class="disclaimer">⚠️ Educational use only. Not financial advice. Data: Alpha Vantage. Always research before investing.</p>
     `;
 
   } catch(err){
@@ -444,14 +640,13 @@ async function analyzeStock(){
   }
 }
 
-// ── Watchlist ──
 function renderWatchlist(){
   const el=document.getElementById('watchlistView');
   if(watchlist.length===0){
     el.innerHTML=`<div class="welcome">
       <div style="font-size:48px;margin-bottom:12px">📋</div>
       <div style="font-size:16px;font-weight:700;color:#374151;margin-bottom:6px">Watchlist Empty</div>
-      <div style="font-size:13px;color:#6b7280">Analyze a stock and tap<br/>"Save to Watchlist"</div>
+      <div style="font-size:13px;color:#6b7280">Analyze a stock and tap "Save to Watchlist"</div>
     </div>`;
     return;
   }
@@ -461,10 +656,10 @@ function renderWatchlist(){
       ${watchlist.map((s,i)=>`
         <div class="watchlist-item">
           <div style="flex:1;cursor:pointer" onclick="loadFromWatchlist('${s.ticker}')">
-            <div style="font-size:14px;font-weight:700;color:#1f2937">${s.emoji} ${s.ticker} <span style="font-weight:400;color:#6b7280;font-size:12px">${s.name.length>20?s.name.substring(0,20)+'...':s.name}</span></div>
+            <div style="font-size:14px;font-weight:700;color:#1f2937">${s.emoji} ${s.ticker} <span style="font-weight:400;color:#6b7280;font-size:12px">${s.name.length>18?s.name.substring(0,18)+'...':s.name}</span></div>
             <div style="font-size:11px;color:#9ca3af;margin-top:2px">${s.date} · IV: $${s.iv}</div>
           </div>
-          <div style="text-align:right;margin-right:12px">
+          <div style="text-align:right;margin-right:10px">
             <div style="font-size:16px;font-weight:900;color:${s.color}">${s.score}/${s.max}</div>
             <div style="font-size:11px;color:${s.color};font-weight:600">${s.label}</div>
           </div>
@@ -501,7 +696,7 @@ function resetApp(){
   document.getElementById('results').innerHTML=`<div class="welcome">
     <div style="font-size:56px;margin-bottom:12px">📈</div>
     <div style="font-size:17px;font-weight:700;color:#374151;margin-bottom:8px">Ready to Analyze</div>
-    <div style="font-size:13px;color:#6b7280;line-height:2">
+    <div style="font-size:13px;color:#6b7280;line-height:2.2">
       <strong>AAPL</strong> · <strong>MSFT</strong> · <strong>KO</strong> · <strong>JNJ</strong> · <strong>WMT</strong>
     </div>
   </div>`;
