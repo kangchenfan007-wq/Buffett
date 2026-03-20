@@ -59,6 +59,17 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 .dcf-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #fde68a;font-size:12px}
 .dcf-row:last-child{border-bottom:none;font-weight:700;font-size:13px;color:#92400e;padding-top:8px;margin-top:4px;border-top:2px solid #fde68a}
 .dcf-formula{background:#fff7ed;border-radius:10px;padding:12px;margin-top:10px;font-size:11px;color:#92400e;line-height:1.8;font-family:monospace}
+/* Backtest */
+.bt-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:12px}
+.bt-table th{background:#f0f9ff;padding:7px 5px;text-align:center;font-size:10px;font-weight:700;color:#0369a1;text-transform:uppercase;border-bottom:2px solid #bae6fd}
+.bt-table td{padding:7px 5px;border-bottom:1px solid #e0f2fe;text-align:center;color:#374151;font-size:11px}
+.bt-table tr:hover{background:#f0f9ff}
+.bt-suggest{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin-top:10px}
+.bt-suggest h4{font-size:12px;font-weight:700;color:#166534;margin-bottom:8px;text-transform:uppercase}
+.bt-suggest-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#374151}
+.bt-apply-btn{width:100%;padding:10px;background:linear-gradient(135deg,#166534,#22c55e);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-top:10px}
+.bt-error-pos{color:#dc2626;font-weight:700}
+.bt-error-neg{color:#16a34a;font-weight:700}
 /* News */
 .news-item{padding:12px 0;border-bottom:1px solid #f3f4f6}
 .news-item:last-child{border-bottom:none}
@@ -334,6 +345,152 @@ function recalcDCF(){
       <strong>Year-by-year breakdown:</strong><br/>
       ${rows.join('<br/>')}
     </div>`;
+}
+
+// ── Apply backtest suggested params ──
+function applyBacktestParams(growth, disc){
+  document.getElementById('dcf_growth').value=(growth*100).toFixed(1);
+  document.getElementById('dcf_disc').value=(disc*100).toFixed(1);
+  recalcDCF();
+  document.getElementById('cc-dcfcalc').scrollIntoView({behavior:'smooth'});
+}
+
+// ── Generate backtest HTML from historical data ──
+function generateBacktestHtml(earningsData, monthlyPrices, fallbackPrice){
+  if(!earningsData||!monthlyPrices)
+    return '<div style="font-size:12px;color:#9ca3af;text-align:center;padding:12px">Historical data unavailable</div>';
+
+  const now=new Date();
+  const qe=earningsData?.quarterlyEarnings||[];
+  const ps=monthlyPrices?.['Monthly Time Series']||monthlyPrices?.['Monthly Adjusted Time Series']||{};
+  const pDates=Object.keys(ps).sort((a,b)=>new Date(b)-new Date(a));
+
+  if(!pDates.length||qe.length<4)
+    return '<div style="font-size:12px;color:#9ca3af;text-align:center;padding:12px">Insufficient historical data for backtesting</div>';
+
+  const latestClose=parseFloat(ps[pDates[0]]?.['4. close']||0);
+  const actualCurrent=latestClose>0?latestClose:fallbackPrice;
+
+  function getPriceAt(td){
+    let closest=null,minD=Infinity;
+    for(const d of pDates){const diff=Math.abs(new Date(d)-td);if(diff<minD){minD=diff;closest=d;}}
+    return closest?parseFloat(ps[closest]['4. close']||0):0;
+  }
+  function getTTMEPS(td){
+    const rel=qe.filter(q=>new Date(q.fiscalDateEnding)<=td).slice(0,4);
+    if(rel.length<4) return null;
+    return rel.reduce((s,q)=>s+(parseFloat(q.reportedEPS)||0),0);
+  }
+  function getGrowthAt(td){
+    const b=qe.filter(q=>new Date(q.fiscalDateEnding)<=td);
+    if(b.length<8) return 0.08;
+    const r4=b.slice(0,4).reduce((s,q)=>s+(parseFloat(q.reportedEPS)||0),0);
+    const p4=b.slice(4,8).reduce((s,q)=>s+(parseFloat(q.reportedEPS)||0),0);
+    if(p4<=0) return 0.08;
+    return Math.min(Math.max((r4-p4)/Math.abs(p4),0.03),0.25);
+  }
+  function calcDCF(eps,growth,disc,termG,yrs){
+    if(eps<=0) return 0;
+    let iv=0,cf=eps;
+    for(let i=1;i<=yrs;i++){cf*=(1+growth);iv+=cf/Math.pow(1+disc,i);}
+    iv+=(cf*(1+termG)/(disc-termG))/Math.pow(1+disc,yrs);
+    return iv;
+  }
+
+  const periods=[
+    {label:'3M',months:3},{label:'6M',months:6},{label:'1Y',months:12},
+    {label:'2Y',months:24},{label:'3Y',months:36},{label:'5Y',months:60}
+  ];
+  const disc=0.10,termG=0.03,yrs=10;
+  const results=[];
+
+  for(const p of periods){
+    const pd=new Date(now);pd.setMonth(pd.getMonth()-p.months);
+    const eps=getTTMEPS(pd), price=getPriceAt(pd), growth=getGrowthAt(pd);
+    if(!eps||eps<=0||!price) continue;
+    const dcfVal=calcDCF(eps,growth,disc,termG,yrs);
+    const err=actualCurrent>0?((dcfVal-actualCurrent)/actualCurrent*100):0;
+    const priceChg=price>0?((actualCurrent-price)/price*100):0;
+    // implied growth via binary search
+    let lo=0.001,hi=0.40;
+    for(let it=0;it<60;it++){const mid=(lo+hi)/2;if(calcDCF(eps,mid,disc,termG,yrs)>actualCurrent) hi=mid; else lo=mid;}
+    results.push({label:p.label,date:pd.toISOString().substring(0,10),eps,growth,price,dcfVal,err,priceChg,impliedG:(lo+hi)/2});
+  }
+
+  if(!results.length)
+    return '<div style="font-size:12px;color:#9ca3af;text-align:center;padding:12px">Insufficient historical earnings data for backtesting</div>';
+
+  // Weighted average implied growth (recent periods weighted more)
+  const wts=results.map((_,i)=>1/(i+1)),totalW=wts.reduce((a,b)=>a+b,0);
+  const sugG=Math.min(Math.max(results.reduce((s,r,i)=>s+r.impliedG*wts[i],0)/totalW,0.03),0.25);
+  const avgErr=results.reduce((s,r)=>s+r.err,0)/results.length;
+  let sugD=0.10;
+  if(avgErr>20) sugD=0.12; else if(avgErr>10) sugD=0.11;
+  else if(avgErr<-20) sugD=0.08; else if(avgErr<-10) sugD=0.09;
+
+  let h=`<div style="font-size:12px;color:#6b7280;margin-bottom:10px;line-height:1.6">
+    Using historical EPS & growth from each past time point to calculate DCF intrinsic value, then comparing with today's actual price (<strong>$${actualCurrent.toFixed(2)}</strong>).
+  </div>
+  <div style="overflow-x:auto"><table class="bt-table"><thead><tr>
+    <th>Period</th><th>Date</th><th>TTM EPS</th><th>Growth</th><th>Past Price</th><th>Price Chg</th><th>DCF Value</th><th>Error</th><th>Implied G</th>
+  </tr></thead><tbody>`;
+
+  for(const r of results){
+    const ec=r.err>0?'bt-error-pos':'bt-error-neg';
+    const pc=r.priceChg>0?'color:#16a34a':'color:#dc2626';
+    h+=`<tr>
+      <td style="font-weight:700">${r.label}</td>
+      <td>${r.date}</td>
+      <td>$${r.eps.toFixed(2)}</td>
+      <td>${(r.growth*100).toFixed(1)}%</td>
+      <td>$${r.price.toFixed(2)}</td>
+      <td style="${pc};font-weight:600">${r.priceChg>0?'+':''}${r.priceChg.toFixed(1)}%</td>
+      <td style="font-weight:700">$${r.dcfVal.toFixed(2)}</td>
+      <td class="${ec}">${r.err>0?'+':''}${r.err.toFixed(1)}%</td>
+      <td style="color:#0369a1;font-weight:600">${(r.impliedG*100).toFixed(1)}%</td>
+    </tr>`;
+  }
+
+  h+=`</tbody></table></div>
+  <div style="font-size:10px;color:#9ca3af;margin-bottom:12px;line-height:1.5">
+    <strong>Error</strong> = (DCF Value − Actual Price) / Actual Price<br/>
+    <strong>Implied G</strong> = growth rate needed for DCF to match actual current price<br/>
+    <strong>Price Chg</strong> = actual stock price change from that time to now
+  </div>
+  <div class="bt-suggest">
+    <h4>🎯 Calibrated Parameters (Based on Historical Accuracy)</h4>
+    <div class="bt-suggest-row"><span>Suggested Growth Rate</span><span style="font-weight:700;color:#166534">${(sugG*100).toFixed(1)}%</span></div>
+    <div class="bt-suggest-row"><span>Suggested Discount Rate</span><span style="font-weight:700;color:#166534">${(sugD*100).toFixed(1)}%</span></div>
+    <div class="bt-suggest-row"><span>Avg Historical Error</span><span class="${avgErr>0?'bt-error-pos':'bt-error-neg'}">${avgErr>0?'+':''}${avgErr.toFixed(1)}%</span></div>
+    <div style="font-size:11px;color:#6b7280;margin-top:8px;line-height:1.5">
+      ${avgErr>15?'⚠️ DCF historically overestimates — model is too optimistic. Consider higher discount rate or lower growth.':
+        avgErr<-15?'📈 DCF historically underestimates — market values this stock higher than the model predicts.':
+        avgErr>5?'⚠️ DCF slightly overestimates — minor parameter adjustment recommended.':
+        avgErr<-5?'📈 DCF slightly underestimates — the stock outperforms model expectations.':
+        '✅ DCF estimates have been relatively accurate historically — current parameters are reasonable.'}
+    </div>
+    <button class="bt-apply-btn" onclick="applyBacktestParams(${sugG.toFixed(4)},${sugD.toFixed(2)})">📐 Apply Calibrated Parameters to DCF Calculator</button>
+  </div>`;
+  return h;
+}
+
+// ── Load backtest data on demand ──
+async function loadBacktest(ticker, estPrice){
+  const container=document.getElementById('bt-content');
+  container.innerHTML='<div style="text-align:center;padding:20px"><div class="spinner"></div><div style="font-size:12px;color:#92400e;margin-top:8px">Loading historical data (2 API calls)...</div></div>';
+  try{
+    if(callsToday>=24){
+      container.innerHTML='<div style="font-size:12px;color:#dc2626;text-align:center;padding:12px">⚠️ API quota too low. Need 2 calls for backtest. Try again tomorrow.</div>';
+      return;
+    }
+    const earningsData=await avFetch('EARNINGS',`symbol=${ticker}`);
+    callsToday++;saveQuota();
+    const monthlyPrices=await avFetch('TIME_SERIES_MONTHLY',`symbol=${ticker}`);
+    callsToday++;saveQuota();
+    container.innerHTML=generateBacktestHtml(earningsData,monthlyPrices,estPrice);
+  }catch(e){
+    container.innerHTML=`<div style="font-size:12px;color:#dc2626;text-align:center;padding:12px">❌ ${e.message}</div>`;
+  }
 }
 
 // ── Generate AI Commentary ──
@@ -777,6 +934,26 @@ async function analyzeStock(){
           </div>
           <button class="dcf-calc-btn" onclick="recalcDCF()">🔄 Recalculate Intrinsic Value</button>
           <div id="dcf-result-area"></div>
+        </div>
+      </div>
+
+      <!-- DCF Backtest -->
+      <div class="result-section">
+        <h3 onclick="toggleSection('backtest')">
+          <span>📊 DCF Backtest — Historical Accuracy</span>
+          <span class="chevron" id="ch-backtest">▼</span>
+        </h3>
+        <div class="collapse-content" id="cc-backtest">
+          <div id="bt-content">
+            <div style="text-align:center;padding:12px">
+              <div style="font-size:12px;color:#6b7280;margin-bottom:10px;line-height:1.6">
+                Compare DCF predictions from past time points (3M, 6M, 1Y, 2Y, 3Y, 5Y ago) with today's actual stock price.<br/>
+                Analyze prediction errors and get calibrated parameters for more accurate future estimates.
+              </div>
+              <button class="dcf-calc-btn" onclick="loadBacktest('${ticker}',${estPrice>0?estPrice.toFixed(2):0})">📊 Load Backtest Analysis (2 API calls)</button>
+              <div style="font-size:10px;color:#9ca3af;margin-top:4px">Uses EARNINGS + TIME_SERIES_MONTHLY endpoints</div>
+            </div>
+          </div>
         </div>
       </div>
 
