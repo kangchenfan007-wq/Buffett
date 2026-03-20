@@ -241,7 +241,25 @@ try {
   callsToday = saved.date===today ? saved.calls : 0;
 } catch(e){}
 
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    // Check for updates every time the page loads
+    reg.update();
+    // When a new service worker is found, notify the user
+    reg.addEventListener('updatefound',()=>{
+      const newSW=reg.installing;
+      newSW.addEventListener('statechange',()=>{
+        if(newSW.state==='installed'&&navigator.serviceWorker.controller){
+          // New version available — show update banner
+          const banner=document.createElement('div');
+          banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#1d4ed8;color:white;padding:12px 16px;font-size:13px;font-weight:600;text-align:center;display:flex;justify-content:center;align-items:center;gap:10px';
+          banner.innerHTML='New version available! <button onclick="location.reload()" style="background:white;color:#1d4ed8;border:none;border-radius:8px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">Update Now</button>';
+          document.body.prepend(banner);
+        }
+      });
+    });
+  }).catch(()=>{});
+}
 
 function saveQuota(){
   localStorage.setItem('av_quota',JSON.stringify({date:new Date().toDateString(),calls:callsToday}));
@@ -297,8 +315,13 @@ async function avFetch(fn,params){
   const res=await fetch(url);
   if(!res.ok) throw new Error(`Network error ${res.status}`);
   const data=await res.json();
-  if(data['Note']) throw new Error('Rate limit. Wait 1 min and retry.');
-  if(data['Information']) throw new Error('Daily limit reached (25/day). Come back tomorrow!');
+  if(data['Note']) throw new Error('Rate limit hit (5 calls/min). Wait 60s and retry.');
+  if(data['Information']){
+    const info=data['Information'];
+    if(info.includes('rate limit')) throw new Error('Daily limit reached (25/day). Come back tomorrow!');
+    if(info.includes('premium')) throw new Error('This endpoint requires a premium API key.');
+    throw new Error(info.length>120?info.substring(0,120)+'...':info);
+  }
   return data;
 }
 
@@ -483,10 +506,26 @@ async function loadBacktest(ticker, estPrice){
       container.innerHTML='<div style="font-size:12px;color:#dc2626;text-align:center;padding:12px">⚠️ API quota too low. Need 2 calls for backtest. Try again tomorrow.</div>';
       return;
     }
-    const earningsData=await avFetch('EARNINGS',`symbol=${ticker}`);
-    callsToday++;saveQuota();
-    const monthlyPrices=await avFetch('TIME_SERIES_MONTHLY',`symbol=${ticker}`);
-    callsToday++;saveQuota();
+    // Fetch earnings data
+    let earningsData=null, monthlyPrices=null;
+    try{
+      earningsData=await avFetch('EARNINGS',`symbol=${ticker}`);
+      callsToday++;saveQuota();
+    }catch(e1){
+      container.innerHTML=`<div style="font-size:12px;color:#dc2626;text-align:center;padding:12px">❌ EARNINGS endpoint error: ${e1.message}<br/><span style="color:#9ca3af;font-size:11px;margin-top:4px;display:block">This endpoint may require a premium API key. You can get one at alphavantage.co</span></div>`;
+      return;
+    }
+    // Wait 15s to avoid per-minute rate limit (free tier: 5 calls/min)
+    container.querySelector('div:last-child').textContent='Waiting for rate limit cooldown (15s)...';
+    await new Promise(r=>setTimeout(r,15000));
+    // Fetch monthly prices
+    try{
+      monthlyPrices=await avFetch('TIME_SERIES_MONTHLY',`symbol=${ticker}`);
+      callsToday++;saveQuota();
+    }catch(e2){
+      container.innerHTML=`<div style="font-size:12px;color:#dc2626;text-align:center;padding:12px">❌ TIME_SERIES_MONTHLY error: ${e2.message}<br/><span style="color:#9ca3af;font-size:11px;margin-top:4px;display:block">Try again in 1 minute if this is a rate limit issue.</span></div>`;
+      return;
+    }
     container.innerHTML=generateBacktestHtml(earningsData,monthlyPrices,estPrice);
   }catch(e){
     container.innerHTML=`<div style="font-size:12px;color:#dc2626;text-align:center;padding:12px">❌ ${e.message}</div>`;
