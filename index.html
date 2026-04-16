@@ -20,7 +20,8 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 .search-row input{flex:1;border:none;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:700;font-family:monospace;color:#1f2937;outline:none;text-transform:uppercase;-webkit-appearance:none}
 .search-row button{background:#1f2937;color:white;border:none;border-radius:12px;padding:12px 18px;font-size:18px;cursor:pointer}
 .status-bar{font-size:11px;padding:5px 16px;text-align:center;background:#1e3a5f;color:#93c5fd}
-.quota-bar{background:#1c1c1e;color:#fde68a;font-size:11px;padding:5px 16px;text-align:center}
+.quota-bar{background:#1c1c1e;color:#fde68a;font-size:11px;padding:5px 16px;text-align:center;display:flex;justify-content:center;align-items:center;gap:8px}
+.quota-bar button{background:#fde68a;color:#1c1c1e;border:none;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer}
 .live-badge{display:inline-block;background:#16a34a;color:white;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
 .container{max-width:480px;margin:0 auto;padding:0 16px 100px}
@@ -107,6 +108,7 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 .key-row{display:flex;gap:8px;margin-bottom:8px}
 .key-row input{flex:1;border:1px solid #e5e7eb;border-radius:10px;padding:9px 12px;font-size:12px;font-family:monospace;outline:none}
 .key-row button{padding:9px 14px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;background:#d97706;color:white}
+.warn-banner{background:#fef3c7;border:1px solid #fde68a;color:#92400e;padding:12px;border-radius:10px;font-size:12px;margin-bottom:10px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -122,7 +124,10 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 </div>
 
 <div class="status-bar" id="statusBar">🟢 Ready — Enter a US stock ticker</div>
-<div class="quota-bar" id="quotaBar">📊 Loading...</div>
+<div class="quota-bar" id="quotaBar">
+  <span id="quotaText">📊 Loading...</span>
+  <button onclick="resetLocalCounter()">Reset Counter</button>
+</div>
 
 <div class="container">
   <div class="page active" id="page-analyze">
@@ -133,14 +138,13 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
         <div style="font-size:13px;color:#6b7280;line-height:2.2">
           <strong>AAPL</strong> · <strong>INTC</strong> · <strong>MSFT</strong> · <strong>KO</strong> · <strong>JNJ</strong>
         </div>
-        <div style="margin-top:16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;text-align:left;font-size:12px;color:#166534;line-height:2">
-          ✅ <strong>Fixed:</strong> API limit bug resolved<br/>
-          🟢 Real-time live stock prices<br/>
-          🧮 Editable DCF calculator<br/>
-          📰 Company-specific news<br/>
-          📊 Smart competitor comparison<br/>
-          🤖 AI commentary & outlook<br/>
-          🔑 Supports 2 API keys (50 calls/day)
+        <div class="warn-banner" style="margin-top:16px;text-align:left">
+          ⚠️ <strong>Important about API limits:</strong><br/>
+          Alpha Vantage tracks limits by your IP address on their server. The local counter is just an estimate.<br/><br/>
+          If you see "Daily limit reached" — it means AV's server is blocking you. Solutions:<br/>
+          • Add 2nd API key in Settings (50/day)<br/>
+          • Wait until tomorrow (resets midnight ET)<br/>
+          • Switch VPN to a different IP
         </div>
       </div>
     </div>
@@ -155,7 +159,7 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
       <div class="watchlist-card">
         <div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:14px">⚙️ API Keys</div>
         <div style="font-size:12px;color:#6b7280;margin-bottom:10px;line-height:1.6">
-          Add up to <strong>2 free API keys</strong> for 50 calls/day (~8 stocks).<br/>
+          Add up to <strong>2 free API keys</strong> for 50 calls/day total.<br/>
           Get free keys at: <strong style="color:#d97706">alphavantage.co/support/#api-key</strong>
         </div>
         <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Key 1 (Primary)</div>
@@ -163,7 +167,7 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
           <input type="text" id="key1Input" placeholder="Paste API key 1..."/>
           <button onclick="saveKeys()">Save</button>
         </div>
-        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">Key 2 (Backup — optional)</div>
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;margin-top:8px">Key 2 (Backup — optional)</div>
         <div class="key-row">
           <input type="text" id="key2Input" placeholder="Paste API key 2..."/>
           <button onclick="saveKeys()">Save</button>
@@ -172,7 +176,13 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
       </div>
       <div class="watchlist-card">
         <div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:10px">📊 Usage Today</div>
-        <div id="settingsQuota" style="font-size:13px;color:#6b7280;line-height:1.8"></div>
+        <div id="settingsQuota" style="font-size:13px;color:#6b7280;line-height:1.8;white-space:pre-wrap"></div>
+        <button onclick="resetLocalCounter()" style="margin-top:10px;width:100%;padding:10px;background:#f8fafc;color:#374151;border:1px solid #e5e7eb;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">
+          🔄 Reset Local Counter
+        </button>
+        <div style="font-size:11px;color:#9ca3af;margin-top:6px;line-height:1.6">
+          The local counter tracks your usage but Alpha Vantage's server has the real limit by IP address.
+        </div>
       </div>
       <div class="watchlist-card">
         <div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:10px">📱 Add to Home Screen</div>
@@ -199,10 +209,10 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 </div>
 
 <script>
-// ── API Key Management (supports 2 keys) ──
 let AV_KEYS = [];
 let activeKeyIdx = 0;
 let callsPerKey = [0, 0];
+let blockedKeys = [false, false]; // track server-side blocks
 let watchlist = [];
 
 function loadKeys() {
@@ -212,58 +222,83 @@ function loadKeys() {
 
   const today = new Date().toDateString();
   try {
-    const saved = JSON.parse(localStorage.getItem('av_quota2') || '{"date":"","calls":[0,0]}');
+    const saved = JSON.parse(localStorage.getItem('av_quota3') || '{"date":"","calls":[0,0],"blocked":[false,false]}');
     if (saved.date === today) {
       callsPerKey = saved.calls || [0, 0];
+      blockedKeys = saved.blocked || [false, false];
     } else {
       callsPerKey = [0, 0];
+      blockedKeys = [false, false];
       saveQuota();
     }
-  } catch(e) { callsPerKey = [0, 0]; }
+  } catch(e) { callsPerKey = [0, 0]; blockedKeys = [false, false]; }
 
-  // Pick active key (one that still has quota)
+  // Pick first non-blocked key
   activeKeyIdx = 0;
-  if (callsPerKey[0] >= 24 && AV_KEYS.length > 1) activeKeyIdx = 1;
+  for (let i = 0; i < AV_KEYS.length; i++) {
+    if (!blockedKeys[i]) { activeKeyIdx = i; break; }
+  }
 }
 
 function saveQuota() {
-  localStorage.setItem('av_quota2', JSON.stringify({
+  localStorage.setItem('av_quota3', JSON.stringify({
     date: new Date().toDateString(),
-    calls: callsPerKey
+    calls: callsPerKey,
+    blocked: blockedKeys
   }));
   updateQuotaDisplay();
 }
 
+function resetLocalCounter() {
+  if (!confirm('Reset local call counter AND clear blocked-key flags?\n\nUse this after waiting or switching VPN/IP.')) return;
+  callsPerKey = [0, 0];
+  blockedKeys = [false, false];
+  saveQuota();
+  alert('✅ Counter and block flags reset. Try again now.');
+}
+
 function updateQuotaDisplay() {
-  const total = AV_KEYS.length * 25;
+  const totalMax = AV_KEYS.length * 25;
   const used = callsPerKey.slice(0, AV_KEYS.length).reduce((a, b) => a + b, 0);
-  const rem = total - used;
+  const rem = Math.max(0, totalMax - used);
   const stocks = Math.floor(rem / 6);
-  const bar = document.getElementById('quotaBar');
-  if (bar) bar.textContent = `📊 API calls: ${used}/${total}  (${rem} remaining · ~${stocks} stocks left today)`;
+  const nonBlocked = AV_KEYS.length - blockedKeys.slice(0, AV_KEYS.length).filter(b => b).length;
+
+  const qt = document.getElementById('quotaText');
+  if (qt) {
+    if (nonBlocked === 0 && AV_KEYS.length > 0) {
+      qt.textContent = `🔴 All keys blocked by server — wait or reset`;
+    } else {
+      qt.textContent = `📊 ${used}/${totalMax} calls · ${rem} left · ~${stocks} stocks · ${nonBlocked}/${AV_KEYS.length} keys active`;
+    }
+  }
+
   const sq = document.getElementById('settingsQuota');
   if (sq) {
-    let txt = `Key 1: ${callsPerKey[0]}/25 used\n`;
-    if (AV_KEYS.length > 1) txt += `Key 2: ${callsPerKey[1]}/25 used\n`;
-    txt += `Total remaining: ${rem} calls · ~${stocks} full analyses`;
+    let txt = `Key 1: ${callsPerKey[0]}/25 used ${blockedKeys[0] ? '🔴 BLOCKED' : '🟢 OK'}\n`;
+    if (AV_KEYS.length > 1) txt += `Key 2: ${callsPerKey[1]}/25 used ${blockedKeys[1] ? '🔴 BLOCKED' : '🟢 OK'}\n`;
+    txt += `\nLocal remaining: ${rem} calls · ~${stocks} full analyses`;
     sq.textContent = txt;
   }
+
   const ks = document.getElementById('keyStatus');
   if (ks) {
     ks.textContent = AV_KEYS.length === 2
-      ? `✅ 2 keys loaded — up to 50 calls/day (~8 stocks)`
-      : `⚠️ 1 key loaded — 25 calls/day (~4 stocks). Add Key 2 for double quota!`;
+      ? `✅ 2 keys loaded — up to 50 calls/day`
+      : `⚠️ 1 key loaded — 25 calls/day. Add Key 2 for double quota!`;
   }
 }
 
 function getCurrentKey() {
-  // Auto-switch to key 2 if key 1 is exhausted
-  if (callsPerKey[0] >= 24 && AV_KEYS.length > 1 && callsPerKey[1] < 24) {
-    activeKeyIdx = 1;
-  } else if (callsPerKey[0] < 24) {
-    activeKeyIdx = 0;
+  // Prefer non-blocked, non-exhausted key
+  for (let i = 0; i < AV_KEYS.length; i++) {
+    if (!blockedKeys[i] && callsPerKey[i] < 25) {
+      activeKeyIdx = i;
+      return AV_KEYS[i];
+    }
   }
-  return AV_KEYS[activeKeyIdx] || AV_KEYS[0];
+  // All blocked/exhausted — return null so caller knows
+  return null;
 }
 
 function incrementCalls() {
@@ -272,16 +307,21 @@ function incrementCalls() {
   saveQuota();
 }
 
-function totalCallsUsed() {
-  return callsPerKey.slice(0, AV_KEYS.length).reduce((a, b) => a + b, 0);
+function markCurrentKeyBlocked() {
+  blockedKeys[activeKeyIdx] = true;
+  saveQuota();
+}
+
+function hasAvailableKey() {
+  return getCurrentKey() !== null;
 }
 
 function totalCallsRemaining() {
-  return AV_KEYS.length * 25 - totalCallsUsed();
-}
-
-function hasEnoughCalls(needed) {
-  return totalCallsRemaining() >= needed;
+  let rem = 0;
+  for (let i = 0; i < AV_KEYS.length; i++) {
+    if (!blockedKeys[i]) rem += Math.max(0, 25 - callsPerKey[i]);
+  }
+  return rem;
 }
 
 function saveKeys() {
@@ -289,9 +329,11 @@ function saveKeys() {
   const k2 = document.getElementById('key2Input').value.trim();
   if (k1) localStorage.setItem('av_key1', k1);
   if (k2) localStorage.setItem('av_key2', k2);
+  // Clear block flags when new keys saved
+  blockedKeys = [false, false];
   loadKeys();
-  updateQuotaDisplay();
-  alert(`✅ Keys saved! ${AV_KEYS.length} key(s) active — ${AV_KEYS.length * 25} calls/day`);
+  saveQuota();
+  alert(`✅ Keys saved! ${AV_KEYS.length} active · up to ${AV_KEYS.length * 25} calls/day`);
 }
 
 function clearWatchlist() {
@@ -303,7 +345,6 @@ function clearWatchlist() {
   }
 }
 
-// ── Init ──
 try { watchlist = JSON.parse(localStorage.getItem('buffett_wl') || '[]'); } catch(e) {}
 loadKeys();
 
@@ -313,7 +354,6 @@ document.getElementById('tickerInput').addEventListener('keypress', e => {
   if (e.key === 'Enter') analyzeStock();
 });
 
-// Pre-fill settings inputs
 window.addEventListener('load', () => {
   const k1el = document.getElementById('key1Input');
   const k2el = document.getElementById('key2Input');
@@ -348,30 +388,52 @@ function toggleSection(id) {
   if (ch) ch.classList.toggle('open');
 }
 
+// ── SMART avFetch: detects server-side blocks and auto-switches keys ──
 async function avFetch(fn, params) {
   const key = getCurrentKey();
+  if (!key) {
+    const err = new Error('All API keys exhausted/blocked by Alpha Vantage server. Come back tomorrow or add another key.');
+    err.isAllBlocked = true;
+    throw err;
+  }
+
   const url = `https://www.alphavantage.co/query?function=${fn}&${params}&apikey=${key}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Network error ${res.status}`);
   const data = await res.json();
-  if (data['Note']) throw new Error('Rate limit hit. Wait 1 minute and retry.');
-  if (data['Information']) {
-    // Auto-switch key
-    if (AV_KEYS.length > 1 && activeKeyIdx === 0) {
-      activeKeyIdx = 1;
-      return avFetch(fn, params);
+
+  // Check for server-side limit messages
+  const noteStr = (data['Note'] || '').toLowerCase();
+  const infoStr = (data['Information'] || '').toLowerCase();
+  const isLimitMsg = noteStr.includes('limit') || noteStr.includes('frequency') ||
+                     infoStr.includes('limit') || infoStr.includes('25 requests') ||
+                     infoStr.includes('standard') || infoStr.includes('premium');
+
+  if (isLimitMsg) {
+    // Alpha Vantage server says this key is blocked
+    markCurrentKeyBlocked();
+    // Try switching to next key
+    const nextKey = getCurrentKey();
+    if (nextKey && nextKey !== key) {
+      console.log('Key blocked, switching to next key...');
+      return avFetch(fn, params); // retry with new key
     }
-    throw new Error('All API keys daily limit reached. Come back tomorrow!');
+    // All keys blocked
+    const err = new Error(`Alpha Vantage server blocked this key (daily limit hit on their end, tracked by IP). ${AV_KEYS.length < 2 ? 'Add a 2nd API key in Settings for more quota.' : 'All keys blocked. Come back tomorrow.'}`);
+    err.isServerBlock = true;
+    throw err;
   }
+
+  if (data['Error Message']) throw new Error(data['Error Message']);
+
   incrementCalls();
   return data;
 }
 
 function n(v) { return parseFloat(v) || 0; }
 
-// ── Refresh price only (1 call) ──
 async function refreshPrice(ticker) {
-  if (!hasEnoughCalls(1)) { alert('Daily API limit reached'); return; }
+  if (!hasAvailableKey()) { alert('No available API key — check Settings'); return; }
   setStatus(`⏳ Refreshing ${ticker} price...`, '#fde68a');
   try {
     const q = await avFetch('GLOBAL_QUOTE', `symbol=${ticker}`);
@@ -395,19 +457,18 @@ async function refreshPrice(ticker) {
       setStatus(`✅ ${ticker} live: $${price.toFixed(2)}`, '#86efac');
     }
   } catch(err) {
-    setStatus('❌ ' + err.message, '#fca5a5');
+    setStatus('❌ ' + err.message.substring(0, 60), '#fca5a5');
     alert(err.message);
   }
 }
 
-// ── DCF Calculator ──
 function recalcDCF() {
-  const eps    = parseFloat(document.getElementById('dcf_eps').value) || 0;
+  const eps = parseFloat(document.getElementById('dcf_eps').value) || 0;
   const growth = parseFloat(document.getElementById('dcf_growth').value) / 100 || 0.08;
-  const term   = parseFloat(document.getElementById('dcf_term').value) / 100 || 0.03;
-  const disc   = parseFloat(document.getElementById('dcf_disc').value) / 100 || 0.10;
-  const yrs    = parseInt(document.getElementById('dcf_yrs').value) || 10;
-  const price  = parseFloat(document.getElementById('dcf_price').value) || 0;
+  const term = parseFloat(document.getElementById('dcf_term').value) / 100 || 0.03;
+  const disc = parseFloat(document.getElementById('dcf_disc').value) / 100 || 0.10;
+  const yrs = parseInt(document.getElementById('dcf_yrs').value) || 10;
+  const price = parseFloat(document.getElementById('dcf_price').value) || 0;
 
   let iv = 0;
   const rows = [];
@@ -443,39 +504,38 @@ function recalcDCF() {
     </div>`;
 }
 
-// ── AI Commentary ──
 function generateCommentary(ticker, ov, compDataArr, currentPrice, analystTgt) {
-  const name       = ov['Name'] || ticker;
-  const sector     = ov['Sector'] || '';
-  const roe        = n(ov['ReturnOnEquityTTM']) * 100;
-  const netMargin  = n(ov['ProfitMargin']) * 100;
-  const opMargin   = n(ov['OperatingMarginTTM']) * 100;
-  const revGrowth  = n(ov['QuarterlyRevenueGrowthYOY']) * 100;
-  const earningsG  = n(ov['QuarterlyEarningsGrowthYOY']) * 100;
-  const debtToEq   = n(ov['DebtToEquity']) / 100;
-  const pegRatio   = n(ov['PEGRatio']);
-  const peRatio    = n(ov['PERatio']);
-  const divYield   = n(ov['DividendYield']) * 100;
-  const roa        = n(ov['ReturnOnAssetsTTM']) * 100;
-  const compROEs   = compDataArr.map(c => n(c.data['ReturnOnEquityTTM']) * 100);
-  const avgROE     = compROEs.length > 0 ? compROEs.reduce((a, b) => a + b, 0) / compROEs.length : 0;
-  const compNames  = compDataArr.map(c => c.ticker).join(', ');
-  const compPEs    = compDataArr.map(c => n(c.data['PERatio'])).filter(v => v > 0);
-  const avgPE      = compPEs.length > 0 ? compPEs.reduce((a, b) => a + b, 0) / compPEs.length : 0;
-  const compM      = compDataArr.map(c => n(c.data['ProfitMargin']) * 100);
-  const avgMargin  = compM.length > 0 ? compM.reduce((a, b) => a + b, 0) / compM.length : 0;
-  const upside     = currentPrice > 0 && analystTgt > 0 ? ((analystTgt - currentPrice) / currentPrice) * 100 : 0;
+  const name = ov['Name'] || ticker;
+  const sector = ov['Sector'] || '';
+  const roe = n(ov['ReturnOnEquityTTM']) * 100;
+  const netMargin = n(ov['ProfitMargin']) * 100;
+  const opMargin = n(ov['OperatingMarginTTM']) * 100;
+  const revGrowth = n(ov['QuarterlyRevenueGrowthYOY']) * 100;
+  const earningsG = n(ov['QuarterlyEarningsGrowthYOY']) * 100;
+  const debtToEq = n(ov['DebtToEquity']) / 100;
+  const pegRatio = n(ov['PEGRatio']);
+  const peRatio = n(ov['PERatio']);
+  const divYield = n(ov['DividendYield']) * 100;
+  const roa = n(ov['ReturnOnAssetsTTM']) * 100;
+  const compROEs = compDataArr.map(c => n(c.data['ReturnOnEquityTTM']) * 100);
+  const avgROE = compROEs.length > 0 ? compROEs.reduce((a, b) => a + b, 0) / compROEs.length : 0;
+  const compNames = compDataArr.map(c => c.ticker).join(', ');
+  const compPEs = compDataArr.map(c => n(c.data['PERatio'])).filter(v => v > 0);
+  const avgPE = compPEs.length > 0 ? compPEs.reduce((a, b) => a + b, 0) / compPEs.length : 0;
+  const compM = compDataArr.map(c => n(c.data['ProfitMargin']) * 100);
+  const avgMargin = compM.length > 0 ? compM.reduce((a, b) => a + b, 0) / compM.length : 0;
+  const upside = currentPrice > 0 && analystTgt > 0 ? ((analystTgt - currentPrice) / currentPrice) * 100 : 0;
 
   let trendR, trendT;
   if (revGrowth > 15 && earningsG > 15) {
     trendR = 'strong';
-    trendT = `${name} shows strong momentum with ${revGrowth.toFixed(1)}% revenue growth and ${earningsG.toFixed(1)}% earnings growth YoY. ${sector === 'Technology' ? 'AI and digital transformation tailwinds provide runway.' : sector === 'Health Care' ? 'Demographics and innovation cycles support sustained demand.' : ''} Compared to ${compNames}, ${name} ${revGrowth > 15 ? 'is growing faster' : 'maintains competitive growth'}. Well-positioned for the next 3–5 years.`;
+    trendT = `${name} shows strong momentum with ${revGrowth.toFixed(1)}% revenue growth and ${earningsG.toFixed(1)}% earnings growth YoY. ${sector === 'Technology' ? 'AI and digital transformation tailwinds provide runway.' : sector === 'Health Care' ? 'Demographics and innovation cycles support sustained demand.' : ''} Compared to ${compNames}, ${name} ${revGrowth > 15 ? 'is growing faster' : 'maintains competitive growth'}. Well-positioned for next 3–5 years.`;
   } else if (revGrowth > 5 || earningsG > 5) {
     trendR = 'moderate';
-    trendT = `${name} shows moderate growth with ${revGrowth.toFixed(1)}% revenue growth YoY. Compared to peers (${compNames}), the company maintains competitive but not leading position. Monitor for acceleration or deceleration over next 2–3 quarters.`;
+    trendT = `${name} shows moderate growth with ${revGrowth.toFixed(1)}% revenue growth YoY. Compared to peers (${compNames}), competitive but not leading. Monitor for acceleration or deceleration over next 2–3 quarters.`;
   } else {
     trendR = 'weak';
-    trendT = `${name}'s growth shows signs of slowing — revenue growth ${revGrowth.toFixed(1)}% and earnings growth ${earningsG.toFixed(1)}% lag expectations. Compared to ${compNames}, the company faces headwinds. Caution warranted unless management demonstrates a credible turnaround.`;
+    trendT = `${name}'s growth shows signs of slowing — revenue growth ${revGrowth.toFixed(1)}% and earnings growth ${earningsG.toFixed(1)}% lag expectations. Compared to ${compNames}, faces headwinds. Caution warranted unless management demonstrates credible turnaround.`;
   }
 
   let mgmtR, mgmtT;
@@ -485,10 +545,10 @@ function generateCommentary(ticker, ov, compDataArr, currentPrice, analystTgt) {
     mgmtT = `Management at ${name} demonstrates strong capital allocation — ROE ${roe.toFixed(1)}% (vs peers ${avgROE.toFixed(1)}%), operating margin ${opMargin.toFixed(1)}%. ${debtToEq < 0.5 ? `Conservative debt/equity ${debtToEq.toFixed(2)} shows financial discipline.` : ''} ROA ${roa.toFixed(1)}% indicates efficient asset use — a key Buffett criterion.`;
   } else if (ms >= 2) {
     mgmtR = 'moderate';
-    mgmtT = `${name}'s management shows mixed results. ROE ${roe.toFixed(1)}% and operating margin ${opMargin.toFixed(1)}% vs peers (${compNames}). ${debtToEq > 1 ? `Debt/equity ${debtToEq.toFixed(2)} warrants monitoring.` : ''} Look for consistent improvement in capital efficiency.`;
+    mgmtT = `${name}'s management shows mixed results. ROE ${roe.toFixed(1)}% and operating margin ${opMargin.toFixed(1)}% vs peers (${compNames}). ${debtToEq > 1 ? `Debt/equity ${debtToEq.toFixed(2)} warrants monitoring.` : ''} Look for consistent improvement.`;
   } else {
     mgmtR = 'weak';
-    mgmtT = `Management efficiency at ${name} raises concerns — ROE ${roe.toFixed(1)}% and ROA ${roa.toFixed(1)}% trail peer averages. Operating margin ${opMargin.toFixed(1)}% suggests cost structure challenges. Buffett would scrutinize leadership's plan to improve returns vs ${compNames}.`;
+    mgmtT = `Management efficiency at ${name} raises concerns — ROE ${roe.toFixed(1)}% and ROA ${roa.toFixed(1)}% trail peer averages. Operating margin ${opMargin.toFixed(1)}% suggests cost challenges. Buffett would scrutinize leadership's plan vs ${compNames}.`;
   }
 
   let compR, compT;
@@ -502,17 +562,17 @@ function generateCommentary(ticker, ov, compDataArr, currentPrice, analystTgt) {
     compT = `${name} is competitively positioned but not dominant vs ${compNames}. Net margin ${netMargin.toFixed(1)}% is ${mb ? 'above' : 'below'} peer average ${avgMargin.toFixed(1)}%. Some strengths but meaningful competition limits pricing power.`;
   } else {
     compR = 'weak';
-    compT = `${name} appears weaker vs ${compNames}. Net margin ${netMargin.toFixed(1)}% trails peer average ${avgMargin.toFixed(1)}%. Buffett would question durability of moat. Assess if pressure is structural or temporary.`;
+    compT = `${name} appears weaker vs ${compNames}. Net margin ${netMargin.toFixed(1)}% trails peer average ${avgMargin.toFixed(1)}%. Buffett would question moat durability. Assess if pressure is structural or temporary.`;
   }
 
   const os = (trendR === 'strong' ? 3 : trendR === 'moderate' ? 2 : 1) + (mgmtR === 'strong' ? 3 : mgmtR === 'moderate' ? 2 : 1) + (compR === 'strong' ? 3 : compR === 'moderate' ? 2 : 1);
   let buffT;
   if (os >= 8) {
-    buffT = `${name} exhibits many qualities Buffett looks for — strong growth, excellent management, competitive advantages. ${pegRatio > 0 && pegRatio < 1 ? `PEG ${pegRatio.toFixed(2)} suggests undervaluation vs growth.` : ''} ${divYield > 0 ? `${divYield.toFixed(2)}% dividend adds total return.` : ''} ${upside > 10 ? `Current price shows ${upside.toFixed(1)}% upside to analyst target.` : ''} Appears to be "wonderful company at fair price."`;
+    buffT = `${name} exhibits many qualities Buffett looks for — strong growth, excellent management, competitive advantages. ${pegRatio > 0 && pegRatio < 1 ? `PEG ${pegRatio.toFixed(2)} suggests undervaluation.` : ''} ${divYield > 0 ? `${divYield.toFixed(2)}% dividend adds return.` : ''} ${upside > 10 ? `Analyst upside: ${upside.toFixed(1)}%.` : ''} Appears to be "wonderful company at fair price."`;
   } else if (os >= 6) {
     buffT = `${name} is a decent business with attractive qualities but notable weaknesses. Buffett would want improvement in ${roe < 15 ? 'ROE ' : ''}${netMargin < 10 ? 'margins ' : ''}before calling it "wonderful." Suitable for patient investors. ${upside > 0 ? `Analyst upside: ${upside.toFixed(1)}%.` : ''}`;
   } else {
-    buffT = `Based on Buffett's criteria, ${name} faces challenges — ${revGrowth < 5 ? 'slowing growth, ' : ''}${roe < 15 ? 'below-target returns, ' : ''}${debtToEq > 1 ? 'elevated debt' : ''}. Buffett would likely look for better opportunities among competitors like ${compNames}.`;
+    buffT = `Based on Buffett's criteria, ${name} faces challenges — ${revGrowth < 5 ? 'slowing growth, ' : ''}${roe < 15 ? 'below-target returns, ' : ''}${debtToEq > 1 ? 'elevated debt' : ''}. Buffett would look for better opportunities among ${compNames}.`;
   }
 
   const rp = r => `<span class="rating-pill ${r === 'strong' ? 'rating-strong' : r === 'moderate' ? 'rating-moderate' : 'rating-weak'}">${r === 'strong' ? '✅ Strong' : r === 'moderate' ? '⚠️ Moderate' : '❌ Weak'}</span>`;
@@ -524,7 +584,6 @@ function generateCommentary(ticker, ov, compDataArr, currentPrice, analystTgt) {
     <div class="commentary-section"><h4>🧓 Buffett's Verdict</h4><p>${buffT}</p></div>`;
 }
 
-// ── Competitor map ──
 const TICKER_COMPETITORS = {
   'INTC':['TSM','AMD','NVDA'],'AMD':['INTC','NVDA','TSM'],'NVDA':['AMD','INTC','TSM'],
   'TSM':['INTC','ASML','AMAT'],'QCOM':['AVGO','MRVL','AMD'],'AVGO':['QCOM','TXN','ADI'],
@@ -548,23 +607,26 @@ const SECTOR_COMPETITORS = {
   'Industrials':['BA','CAT','GE'],'Communication Services':['GOOGL','META','NFLX'],
 };
 
-// ── Main Analysis ──
 async function analyzeStock() {
   const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
   if (!ticker) { alert('Please enter a ticker'); return; }
 
-  // ✅ FIXED: Check actual remaining calls, need at least 4 minimum
-  if (!hasEnoughCalls(4)) {
-    const rem = totalCallsRemaining();
+  if (!hasAvailableKey()) {
     document.getElementById('results').innerHTML = `<div class="error-box" style="margin-top:16px">
-      <h3>⏰ Not Enough API Calls</h3>
-      <p>Only <strong>${rem} call${rem !== 1 ? 's' : ''}</strong> remaining today — need at least 4 for analysis.<br/><br/>
-      ${AV_KEYS.length < 2
-        ? '💡 <strong>Add a 2nd free API key in Settings</strong> to double your daily quota to 50 calls!'
-        : '⏰ Both keys exhausted. Come back tomorrow!'
-      }</p>
+      <h3>⏰ No API Keys Available</h3>
+      <p>All your API keys have been blocked or exhausted by Alpha Vantage's server today.</p>
+      <div style="margin-top:14px;padding:12px;background:#fffbeb;border-radius:10px;text-align:left;font-size:12px;color:#92400e;line-height:1.8">
+        <strong>✅ Solutions:</strong><br/>
+        1. Wait until tomorrow (AV resets at midnight ET / 1pm Beijing)<br/>
+        2. Add a 2nd free API key in Settings → gets you 50/day<br/>
+        3. Change VPN server to get a new IP address<br/>
+        4. Click "Reset Counter" below if you changed VPN and want to retry
+      </div>
       <button onclick="showPage('settings')" style="margin-top:12px;padding:10px 24px;background:#d97706;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
         ⚙️ Go to Settings
+      </button>
+      <button onclick="resetLocalCounter()" style="margin-top:8px;padding:10px 24px;background:white;color:#374151;border:1px solid #e5e7eb;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
+        🔄 Reset Counter & Try Again
       </button>
     </div>`;
     return;
@@ -575,14 +637,12 @@ async function analyzeStock() {
   results.innerHTML = `<div class="loading"><div class="spinner"></div>
     <p>Analyzing <strong>${ticker}</strong></p>
     <div class="step" id="loadStep">Fetching live price...</div>
-    <div style="font-size:11px;color:#9ca3af;margin-top:6px">${totalCallsRemaining()} API calls remaining</div>
   </div>`;
   setStatus(`⏳ Analyzing ${ticker}...`, '#fde68a');
 
   function setStep(msg) { const s = document.getElementById('loadStep'); if (s) s.textContent = msg; }
 
   try {
-    // CALL 1: Live price
     setStep('💹 Live price (1/6)...');
     const quote = await avFetch('GLOBAL_QUOTE', `symbol=${ticker}`);
     const gq = quote['Global Quote'] || {};
@@ -597,12 +657,10 @@ async function analyzeStock() {
 
     if (!currentPrice) throw new Error(`No price data for "${ticker}". Check symbol — e.g. use GOOG not GOOGL.`);
 
-    // CALL 2: Overview
     setStep('📊 Financials (2/6)...');
     const ov = await avFetch('OVERVIEW', `symbol=${ticker}`);
     if (!ov['Name']) throw new Error(`"${ticker}" company data not found.`);
 
-    // CALL 3: News
     setStep('📰 News (3/6)...');
     let newsItems = [];
     try {
@@ -614,20 +672,19 @@ async function analyzeStock() {
       if (newsItems.length === 0) newsItems = (nd?.feed || []).slice(0, 4);
     } catch(e) {}
 
-    // CALLS 4-7: Competitors
     const sector = ov['Sector'] || 'Technology';
     const compTickers = (TICKER_COMPETITORS[ticker] || SECTOR_COMPETITORS[sector] || ['AAPL','MSFT','GOOGL'])
       .filter(t => t !== ticker).slice(0, 2);
 
     let compData = [];
     for (let i = 0; i < compTickers.length; i++) {
-      if (!hasEnoughCalls(2)) break;
-      setStep(`📊 ${compTickers[i]} data (${4 + i * 2}/6)...`);
+      if (!hasAvailableKey()) break;
+      setStep(`📊 ${compTickers[i]} (${4 + i * 2}/6)...`);
       try {
         const cd = await avFetch('OVERVIEW', `symbol=${compTickers[i]}`);
         if (cd['Name']) {
           let compPrice = 0, compChange = 0, compChangePct = 0;
-          if (hasEnoughCalls(1)) {
+          if (hasAvailableKey()) {
             setStep(`💹 ${compTickers[i]} price (${5 + i * 2}/6)...`);
             try {
               const cq = await avFetch('GLOBAL_QUOTE', `symbol=${compTickers[i]}`);
@@ -644,34 +701,29 @@ async function analyzeStock() {
 
     setStep('🧮 Calculating scores...');
 
-    // Parse
     const companyName = ov['Name'] || ticker;
-    const industry    = ov['Industry'] || '';
-    const mktCap      = n(ov['MarketCapitalization']);
-    const eps         = n(ov['EPS']);
-    const peRatio     = n(ov['PERatio']);
-    const forwardPE   = n(ov['ForwardPE']);
-    const pegRatio    = n(ov['PEGRatio']);
-    const pbRatio     = n(ov['PriceToBookRatio']);
-    const pSales      = n(ov['PriceToSalesRatioTTM']);
-    const divYield    = n(ov['DividendYield']) * 100;
-    const roe         = n(ov['ReturnOnEquityTTM']) * 100;
-    const roa         = n(ov['ReturnOnAssetsTTM']) * 100;
-    const netMargin   = n(ov['ProfitMargin']) * 100;
-    const opMargin    = n(ov['OperatingMarginTTM']) * 100;
-    const revGrowth   = n(ov['QuarterlyRevenueGrowthYOY']) * 100;
-    const earningsG   = n(ov['QuarterlyEarningsGrowthYOY']) * 100;
-    const analystTgt  = n(ov['AnalystTargetPrice']);
-    const beta        = n(ov['Beta']);
-    const week52High  = n(ov['52WeekHigh']);
-    const week52Low   = n(ov['52WeekLow']);
-    const evEbitda    = n(ov['EVToEBITDA']);
-    const debtToEq    = n(ov['DebtToEquity']) / 100;
-    const currentR    = n(ov['CurrentRatio']);
-    const upside      = currentPrice > 0 && analystTgt > 0 ? ((analystTgt - currentPrice) / currentPrice) * 100 : 0;
+    const industry = ov['Industry'] || '';
+    const mktCap = n(ov['MarketCapitalization']);
+    const eps = n(ov['EPS']);
+    const peRatio = n(ov['PERatio']);
+    const pegRatio = n(ov['PEGRatio']);
+    const pbRatio = n(ov['PriceToBookRatio']);
+    const pSales = n(ov['PriceToSalesRatioTTM']);
+    const divYield = n(ov['DividendYield']) * 100;
+    const roe = n(ov['ReturnOnEquityTTM']) * 100;
+    const roa = n(ov['ReturnOnAssetsTTM']) * 100;
+    const netMargin = n(ov['ProfitMargin']) * 100;
+    const opMargin = n(ov['OperatingMarginTTM']) * 100;
+    const revGrowth = n(ov['QuarterlyRevenueGrowthYOY']) * 100;
+    const earningsG = n(ov['QuarterlyEarningsGrowthYOY']) * 100;
+    const analystTgt = n(ov['AnalystTargetPrice']);
+    const beta = n(ov['Beta']);
+    const evEbitda = n(ov['EVToEBITDA']);
+    const debtToEq = n(ov['DebtToEquity']) / 100;
+    const currentR = n(ov['CurrentRatio']);
+    const upside = currentPrice > 0 && analystTgt > 0 ? ((analystTgt - currentPrice) / currentPrice) * 100 : 0;
 
-    // DCF with REAL price
-    const g  = Math.min(Math.max(earningsG > 0 ? earningsG / 100 : revGrowth > 0 ? revGrowth / 100 : 0.08, 0.03), 0.25);
+    const g = Math.min(Math.max(earningsG > 0 ? earningsG / 100 : revGrowth > 0 ? revGrowth / 100 : 0.08, 0.03), 0.25);
     const dr = 0.10, tg = 0.03, yrs = 10;
     let iv = 0;
     if (eps > 0) {
@@ -681,7 +733,6 @@ async function analyzeStock() {
     }
     const mos = currentPrice > 0 && iv > 0 ? ((iv - currentPrice) / iv) * 100 : null;
 
-    // Scores
     const dcfScore = mos === null ? 0 : mos >= 30 ? 25 : mos >= 10 ? 18 : mos >= 0 ? 10 : 0;
     const dcfItems = [
       { ok: iv > 0, text: `Intrinsic Value: $${iv.toFixed(2)}/share` },
@@ -693,40 +744,39 @@ async function analyzeStock() {
     const epsScore = (epsOk ? 4 : 0) + (peOk ? 3 : 0) + (pegOk ? 4 : 0) + (pbOk ? 2 : 0);
     const epsItems = [
       { ok: epsOk, text: `EPS (TTM): $${eps.toFixed(2)}` },
-      { ok: peOk,  text: `P/E: ${peRatio > 0 ? peRatio.toFixed(1) : 'N/A'} (target <25)` },
+      { ok: peOk, text: `P/E: ${peRatio > 0 ? peRatio.toFixed(1) : 'N/A'} (target <25)` },
       { ok: pegOk, text: `PEG: ${pegRatio > 0 ? pegRatio.toFixed(2) : 'N/A'} (under 1.0)` },
-      { ok: pbOk,  text: `P/B: ${pbRatio > 0 ? pbRatio.toFixed(2) : 'N/A'} (under 3.0)` },
+      { ok: pbOk, text: `P/B: ${pbRatio > 0 ? pbRatio.toFixed(2) : 'N/A'} (under 3.0)` },
     ];
     const moatItems = [
-      { ok: roe >= 15,       text: `ROE: ${roe.toFixed(1)}% (≥15%)` },
+      { ok: roe >= 15, text: `ROE: ${roe.toFixed(1)}% (≥15%)` },
       { ok: netMargin >= 10, text: `Net Margin: ${netMargin.toFixed(1)}% (≥10%)` },
-      { ok: opMargin >= 15,  text: `Op Margin: ${opMargin.toFixed(1)}% (≥15%)` },
-      { ok: revGrowth >= 5,  text: `Rev Growth: ${revGrowth.toFixed(1)}% YoY (≥5%)` },
+      { ok: opMargin >= 15, text: `Op Margin: ${opMargin.toFixed(1)}% (≥15%)` },
+      { ok: revGrowth >= 5, text: `Rev Growth: ${revGrowth.toFixed(1)}% YoY (≥5%)` },
     ];
     const moatScore = moatItems.filter(i => i.ok).length * 6;
     const debtItems = [
       { ok: debtToEq > 0 && debtToEq < 0.5, text: debtToEq > 0 ? `Debt/Equity: ${debtToEq.toFixed(2)} (<0.5)` : 'Debt/Equity: N/A' },
-      { ok: currentR >= 1.5,                 text: currentR > 0 ? `Current Ratio: ${currentR.toFixed(2)} (≥1.5)` : 'Current Ratio: N/A' },
-      { ok: roa >= 5,                        text: `ROA: ${roa.toFixed(1)}% (≥5%)` },
-      { ok: evEbitda > 0 && evEbitda < 15,   text: evEbitda > 0 ? `EV/EBITDA: ${evEbitda.toFixed(1)} (<15)` : 'EV/EBITDA: N/A' },
+      { ok: currentR >= 1.5, text: currentR > 0 ? `Current Ratio: ${currentR.toFixed(2)} (≥1.5)` : 'Current Ratio: N/A' },
+      { ok: roa >= 5, text: `ROA: ${roa.toFixed(1)}% (≥5%)` },
+      { ok: evEbitda > 0 && evEbitda < 15, text: evEbitda > 0 ? `EV/EBITDA: ${evEbitda.toFixed(1)} (<15)` : 'EV/EBITDA: N/A' },
     ];
     const debtScore = debtItems.filter(i => i.ok).length * 6;
     const oeItems = [
-      { ok: netMargin > 0,        text: `Net Margin: ${netMargin.toFixed(1)}%` },
-      { ok: roe >= 15,            text: `ROE ${roe.toFixed(1)}% = strong owner earnings` },
+      { ok: netMargin > 0, text: `Net Margin: ${netMargin.toFixed(1)}%` },
+      { ok: roe >= 15, text: `ROE ${roe.toFixed(1)}% = strong owner earnings` },
       { ok: pSales > 0 && pSales < 3, text: pSales > 0 ? `P/Sales: ${pSales.toFixed(2)} (<3.0)` : 'P/Sales: N/A' },
-      { ok: divYield > 0,         text: divYield > 0 ? `Dividend: ${divYield.toFixed(2)}%` : 'No dividend' },
+      { ok: divYield > 0, text: divYield > 0 ? `Dividend: ${divYield.toFixed(2)}%` : 'No dividend' },
     ];
     const oeScore = oeItems.filter(i => i.ok).length * 6;
-    const total    = dcfScore + epsScore + moatScore + debtScore + oeScore;
+    const total = dcfScore + epsScore + moatScore + debtScore + oeScore;
     const maxScore = 26 + 13 + 24 + 24 + 24;
-    const verdict  = total >= 65
+    const verdict = total >= 65
       ? { label: 'Strong Buy', color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0', emoji: '🟢' }
       : total >= 45
       ? { label: 'Watch List', color: '#d97706', bg: '#fffbeb', border: '#fde68a', emoji: '🟡' }
-      : { label: 'Avoid',      color: '#dc2626', bg: '#fef2f2', border: '#fecaca', emoji: '🔴' };
+      : { label: 'Avoid', color: '#dc2626', bg: '#fef2f2', border: '#fecaca', emoji: '🔴' };
 
-    // News HTML
     const newsHtml = newsItems.length > 0 ? newsItems.map(item => {
       const sl = item.overall_sentiment_label || 'Neutral';
       const sc = sl.toLowerCase().includes('bull') || sl.toLowerCase().includes('positive') ? 'sent-positive'
@@ -746,19 +796,18 @@ async function analyzeStock() {
       </div>`;
     }).join('') : '<div style="font-size:13px;color:#9ca3af;padding:12px 0;text-align:center">No recent news</div>';
 
-    // Competitor table
     const allStocks = [{ ticker, data: ov, price: currentPrice, change, changePct }, ...compData];
     const metrics = [
-      { key: 'price',       label: 'Price',      fmt: s => s.price > 0 ? '$' + s.price.toFixed(2) : 'N/A',   better: 'none' },
-      { key: 'changePct',   label: 'Today %',    fmt: s => s.price > 0 ? (s.changePct >= 0 ? '+' : '') + s.changePct.toFixed(2) + '%' : 'N/A', better: 'higher', colorFn: s => s.changePct >= 0 ? '#16a34a' : '#dc2626' },
-      { key: 'PERatio',     label: 'P/E',        fmt: s => n(s.data['PERatio']) > 0 ? n(s.data['PERatio']).toFixed(1) : 'N/A', better: 'lower' },
-      { key: 'PEGRatio',    label: 'PEG',        fmt: s => n(s.data['PEGRatio']) > 0 ? n(s.data['PEGRatio']).toFixed(2) : 'N/A', better: 'lower' },
-      { key: 'ProfitMargin',label: 'Net Margin', fmt: s => (n(s.data['ProfitMargin']) * 100).toFixed(1) + '%', better: 'higher' },
-      { key: 'ReturnOnEquityTTM', label: 'ROE',  fmt: s => (n(s.data['ReturnOnEquityTTM']) * 100).toFixed(1) + '%', better: 'higher' },
-      { key: 'EPS',         label: 'EPS',        fmt: s => '$' + n(s.data['EPS']).toFixed(2), better: 'higher' },
-      { key: 'DividendYield',label: 'Dividend',  fmt: s => (n(s.data['DividendYield']) * 100).toFixed(2) + '%', better: 'higher' },
-      { key: 'DebtToEquity',label: 'Debt/Eq',    fmt: s => n(s.data['DebtToEquity']) > 0 ? (n(s.data['DebtToEquity']) / 100).toFixed(2) : 'N/A', better: 'lower' },
-      { key: 'Beta',        label: 'Beta',       fmt: s => n(s.data['Beta']) > 0 ? n(s.data['Beta']).toFixed(2) : 'N/A', better: 'lower' },
+      { key: 'price', label: 'Price', fmt: s => s.price > 0 ? '$' + s.price.toFixed(2) : 'N/A', better: 'none' },
+      { key: 'changePct', label: 'Today %', fmt: s => s.price > 0 ? (s.changePct >= 0 ? '+' : '') + s.changePct.toFixed(2) + '%' : 'N/A', better: 'higher', colorFn: s => s.changePct >= 0 ? '#16a34a' : '#dc2626' },
+      { key: 'PERatio', label: 'P/E', fmt: s => n(s.data['PERatio']) > 0 ? n(s.data['PERatio']).toFixed(1) : 'N/A', better: 'lower' },
+      { key: 'PEGRatio', label: 'PEG', fmt: s => n(s.data['PEGRatio']) > 0 ? n(s.data['PEGRatio']).toFixed(2) : 'N/A', better: 'lower' },
+      { key: 'ProfitMargin', label: 'Net Margin', fmt: s => (n(s.data['ProfitMargin']) * 100).toFixed(1) + '%', better: 'higher' },
+      { key: 'ReturnOnEquityTTM', label: 'ROE', fmt: s => (n(s.data['ReturnOnEquityTTM']) * 100).toFixed(1) + '%', better: 'higher' },
+      { key: 'EPS', label: 'EPS', fmt: s => '$' + n(s.data['EPS']).toFixed(2), better: 'higher' },
+      { key: 'DividendYield', label: 'Dividend', fmt: s => (n(s.data['DividendYield']) * 100).toFixed(2) + '%', better: 'higher' },
+      { key: 'DebtToEquity', label: 'Debt/Eq', fmt: s => n(s.data['DebtToEquity']) > 0 ? (n(s.data['DebtToEquity']) / 100).toFixed(2) : 'N/A', better: 'lower' },
+      { key: 'Beta', label: 'Beta', fmt: s => n(s.data['Beta']) > 0 ? n(s.data['Beta']).toFixed(2) : 'N/A', better: 'lower' },
     ];
 
     function getBestIdx(m) {
@@ -790,7 +839,7 @@ async function analyzeStock() {
           }).join('')}
         </tbody>
       </table></div>
-      <div style="font-size:10px;color:#9ca3af;margin-top:6px">🏆 best · ★ your stock · Prices as of ${tradeDate}</div>`;
+      <div style="font-size:10px;color:#9ca3af;margin-top:6px">🏆 best · ★ your stock · As of ${tradeDate}</div>`;
 
     const commentaryHtml = generateCommentary(ticker, ov, compData, currentPrice, analystTgt);
     const fmtCap = c => c >= 1e12 ? '$' + (c / 1e12).toFixed(2) + 'T' : c >= 1e9 ? '$' + (c / 1e9).toFixed(1) + 'B' : '$' + (c / 1e6).toFixed(0) + 'M';
@@ -899,9 +948,7 @@ async function analyzeStock() {
           <span class="chevron open" id="ch-dcfcalc">▼</span>
         </h3>
         <div class="collapse-content open" id="cc-dcfcalc">
-          <div style="font-size:12px;color:#6b7280;margin-bottom:10px">
-            Adjust any parameter → tap Recalculate. Price auto-filled from live market data.
-          </div>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:10px">Adjust parameters and tap Recalculate. Price auto-filled from live market.</div>
           <div class="dcf-input-grid">
             <div class="dcf-input-box"><label>EPS ($)</label><input type="number" id="dcf_eps" value="${eps.toFixed(2)}" step="0.01"/></div>
             <div class="dcf-input-box"><label>Growth Rate (%)</label><input type="number" id="dcf_growth" value="${(g * 100).toFixed(1)}" step="0.5"/></div>
@@ -917,7 +964,7 @@ async function analyzeStock() {
 
       <div class="result-section">
         <h3 onclick="toggleSection('comp')">
-          <span>📊 vs ${compData.map(c => c.ticker).join(', ')} <span class="live-badge">LIVE</span></span>
+          <span>📊 vs ${compData.map(c => c.ticker).join(', ') || '—'} <span class="live-badge">LIVE</span></span>
           <span class="chevron open" id="ch-comp">▼</span>
         </h3>
         <div class="collapse-content open" id="cc-comp">${compTableHtml}</div>
@@ -948,19 +995,42 @@ async function analyzeStock() {
         💾 Save to Watchlist
       </button>
       <button class="btn-reset" onclick="resetApp()">🔄 Analyze Another Stock</button>
-      <p class="disclaimer">⚠️ Educational use only. Not financial advice. Live data via Alpha Vantage. Always do your own research.</p>
+      <p class="disclaimer">⚠️ Educational use only. Not financial advice. Live data via Alpha Vantage.</p>
     `;
 
     recalcDCF();
 
   } catch(err) {
     setStatus('❌ ' + err.message.substring(0, 60), '#fca5a5');
-    results.innerHTML = `<div class="error-box" style="margin-top:16px">
-      <h3>❌ Error</h3>
-      <p style="margin-bottom:12px">${err.message}</p>
-      <p style="font-size:12px">Examples: AAPL · INTC · MSFT · KO · JNJ · WMT · GOOG</p>
-      <button onclick="analyzeStock()" style="margin-top:12px;padding:10px 24px;background:#dc2626;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">🔄 Retry</button>
-    </div>`;
+
+    if (err.isServerBlock || err.isAllBlocked) {
+      results.innerHTML = `<div class="error-box" style="margin-top:16px">
+        <h3>🔴 API Server Limit Hit</h3>
+        <p style="margin-bottom:12px">${err.message}</p>
+        <div style="margin-top:14px;padding:12px;background:#fffbeb;border-radius:10px;text-align:left;font-size:12px;color:#92400e;line-height:1.8">
+          <strong>Why this happens:</strong><br/>
+          Alpha Vantage tracks limits by <strong>IP address + key</strong> on their server. Even if your local counter shows remaining calls, their server may have blocked your IP after testing earlier.<br/><br/>
+          <strong>✅ Solutions:</strong><br/>
+          1. <strong>Wait</strong> until midnight US Eastern (1pm Beijing) for reset<br/>
+          2. <strong>Add 2nd API key</strong> in Settings — doubles quota<br/>
+          3. <strong>Change VPN server</strong> to get new IP address<br/>
+          4. <strong>Reset counter</strong> below if you changed VPN
+        </div>
+        <button onclick="showPage('settings')" style="margin-top:12px;padding:10px 24px;background:#d97706;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
+          ⚙️ Go to Settings
+        </button>
+        <button onclick="resetLocalCounter()" style="margin-top:8px;padding:10px 24px;background:white;color:#374151;border:1px solid #e5e7eb;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
+          🔄 Reset Counter & Retry
+        </button>
+      </div>`;
+    } else {
+      results.innerHTML = `<div class="error-box" style="margin-top:16px">
+        <h3>❌ Error</h3>
+        <p style="margin-bottom:12px">${err.message}</p>
+        <p style="font-size:12px">Examples: AAPL · INTC · MSFT · KO · JNJ · WMT · GOOG</p>
+        <button onclick="analyzeStock()" style="margin-top:12px;padding:10px 24px;background:#dc2626;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">🔄 Retry</button>
+      </div>`;
+    }
   }
 }
 
@@ -987,8 +1057,7 @@ function renderWatchlist() {
       </div>
       <button onclick="removeFromWatchlist(${i})" style="background:none;border:none;color:#f87171;font-size:18px;cursor:pointer;padding:4px">✕</button>
     </div>`).join('')}
-  </div>
-  <p class="disclaimer">Tap any stock to re-analyze it</p>`;
+  </div>`;
 }
 
 function loadFromWatchlist(ticker) {
