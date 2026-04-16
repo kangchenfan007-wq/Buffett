@@ -21,6 +21,8 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 .search-row button{background:#1f2937;color:white;border:none;border-radius:12px;padding:12px 18px;font-size:18px;cursor:pointer}
 .status-bar{font-size:11px;padding:5px 16px;text-align:center;background:#1e3a5f;color:#93c5fd}
 .quota-bar{background:#1c1c1e;color:#fde68a;font-size:11px;padding:5px 16px;text-align:center}
+.live-badge{display:inline-block;background:#16a34a;color:white;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
 .container{max-width:480px;margin:0 auto;padding:0 16px 100px}
 .loading{text-align:center;padding:50px 20px}
 .spinner{width:48px;height:48px;border:4px solid #fde68a;border-top-color:#d97706;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
@@ -30,7 +32,6 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 .error-box{background:#fef2f2;border:1px solid #fecaca;border-radius:14px;padding:20px;margin-top:16px;text-align:center}
 .error-box h3{font-size:16px;color:#dc2626;margin-bottom:8px}
 .error-box p{font-size:13px;color:#4b5563;line-height:1.6}
-.card{background:white;border-radius:14px;border:1px solid #f3f4f6;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:12px}
 .company-header{background:white;border-radius:14px;border:1px solid #f3f4f6;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin:16px 0 12px}
 .price-row{display:flex;justify-content:space-between;align-items:flex-start}
 .up{color:#16a34a}.down{color:#dc2626}
@@ -48,7 +49,6 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 .check-item{font-size:12px;color:#4b5563;display:flex;align-items:flex-start;gap:6px;margin-bottom:5px;line-height:1.4}
 .check-ok{color:#22c55e;font-weight:700;flex-shrink:0}
 .check-no{color:#f87171;font-weight:700;flex-shrink:0}
-/* DCF */
 .dcf-input-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .dcf-input-box{background:#f8fafc;border-radius:10px;padding:10px}
 .dcf-input-box label{font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;display:block;margin-bottom:4px}
@@ -59,18 +59,6 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 .dcf-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #fde68a;font-size:12px}
 .dcf-row:last-child{border-bottom:none;font-weight:700;font-size:13px;color:#92400e;padding-top:8px;margin-top:4px;border-top:2px solid #fde68a}
 .dcf-formula{background:#fff7ed;border-radius:10px;padding:12px;margin-top:10px;font-size:11px;color:#92400e;line-height:1.8;font-family:monospace}
-/* Backtest */
-.bt-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:12px}
-.bt-table th{background:#f0f9ff;padding:7px 5px;text-align:center;font-size:10px;font-weight:700;color:#0369a1;text-transform:uppercase;border-bottom:2px solid #bae6fd}
-.bt-table td{padding:7px 5px;border-bottom:1px solid #e0f2fe;text-align:center;color:#374151;font-size:11px}
-.bt-table tr:hover{background:#f0f9ff}
-.bt-suggest{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin-top:10px}
-.bt-suggest h4{font-size:12px;font-weight:700;color:#166534;margin-bottom:8px;text-transform:uppercase}
-.bt-suggest-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#374151}
-.bt-apply-btn{width:100%;padding:10px;background:linear-gradient(135deg,#166534,#22c55e);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-top:10px}
-.bt-error-pos{color:#dc2626;font-weight:700}
-.bt-error-neg{color:#16a34a;font-weight:700}
-/* News */
 .news-item{padding:12px 0;border-bottom:1px solid #f3f4f6}
 .news-item:last-child{border-bottom:none}
 .news-headline{font-size:13px;font-weight:600;color:#1f2937;line-height:1.4;margin-bottom:5px}
@@ -79,7 +67,6 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 .sent-positive{background:#dcfce7;color:#16a34a}
 .sent-negative{background:#fef2f2;color:#dc2626}
 .sent-neutral{background:#f3f4f6;color:#6b7280}
-/* Comparison */
 .comp-table{width:100%;border-collapse:collapse;font-size:11px}
 .comp-table th{background:#f8fafc;padding:7px 5px;text-align:center;font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:2px solid #e5e7eb}
 .comp-table th:first-child{text-align:left}
@@ -88,10 +75,7 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 .comp-table tr:last-child td{border-bottom:none}
 .comp-highlight{background:#fffbeb}
 .comp-best{color:#16a34a;font-weight:800}
-.comp-worst{color:#dc2626}
 .comp-badge{font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px;background:#fef3c7;color:#d97706;margin-left:3px;vertical-align:middle}
-/* AI Commentary */
-.commentary-box{background:white;border-radius:14px;border:1px solid #f3f4f6;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
 .commentary-section{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #f3f4f6}
 .commentary-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
 .commentary-section h4{font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em}
@@ -100,12 +84,12 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 .rating-strong{background:#dcfce7;color:#16a34a}
 .rating-moderate{background:#fef3c7;color:#d97706}
 .rating-weak{background:#fef2f2;color:#dc2626}
-/* Quote */
 .quote-box{background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:16px;margin-bottom:12px;text-align:center}
 .quote-box p{font-size:12px;color:#92400e;font-style:italic;line-height:1.6}
 .quote-box span{font-size:11px;color:#d97706;margin-top:6px;display:block}
 .btn-save{width:100%;padding:14px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:white;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px}
 .btn-reset{width:100%;padding:14px;background:white;border:1.5px solid #e5e7eb;color:#4b5563;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px}
+.btn-refresh{width:100%;padding:11px;background:white;border:1.5px solid #16a34a;color:#16a34a;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px}
 .watchlist-card{background:white;border-radius:14px;border:1px solid #f3f4f6;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:16px}
 .watchlist-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f3f4f6}
 .watchlist-item:last-child{border-bottom:none}
@@ -144,11 +128,15 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
         <div style="font-size:17px;font-weight:700;color:#374151;margin-bottom:8px">Ready to Analyze</div>
         <div style="font-size:13px;color:#6b7280;line-height:2.2"><strong>AAPL</strong> · <strong>INTC</strong> · <strong>MSFT</strong> · <strong>KO</strong> · <strong>JNJ</strong></div>
         <div style="margin-top:16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;text-align:left;font-size:12px;color:#166534;line-height:1.9">
-          ✨ <strong>Features:</strong><br/>
+          ✨ <strong>NEW: Real-time prices!</strong><br/>
+          🟢 Live stock price + daily change<br/>
           🧮 Editable DCF calculator<br/>
-          📰 Company-specific news & sentiment<br/>
+          📰 Company-specific news<br/>
           📊 Smart competitor comparison<br/>
-          🤖 AI commentary on future outlook
+          🤖 AI commentary<br/>
+          <br/>
+          ⚠️ Uses 5-6 API calls per analysis<br/>
+          Free tier: ~4 stocks/day
         </div>
       </div>
     </div>
@@ -171,16 +159,12 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
           <div id="settingsQuota" style="font-size:13px;color:#6b7280"></div>
         </div>
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f3f4f6;font-size:12px;color:#6b7280;line-height:1.8">
-          💡 Free tier: 25 calls/day<br/>
+          💡 Free tier: 25 calls/day (~4 stocks)<br/>
           Get extra key: <strong style="color:#d97706">alphavantage.co/support/#api-key</strong>
         </div>
         <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f3f4f6">
           <button onclick="clearWatchlist()" style="width:100%;padding:11px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer">🗑️ Clear Watchlist</button>
         </div>
-      </div>
-      <div class="watchlist-card">
-        <div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:10px">📱 Install on iPhone</div>
-        <div style="font-size:13px;color:#4b5563;line-height:1.9">1. Open in <strong>Safari</strong><br/>2. Tap <strong>Share ↑</strong><br/>3. Tap <strong>"Add to Home Screen"</strong><br/>4. Tap <strong>"Add"</strong> ✅</div>
       </div>
     </div>
   </div>
@@ -196,36 +180,26 @@ body{background:linear-gradient(135deg,#fffbeb,#fff7ed);min-height:100vh;padding
 let AV_KEY = localStorage.getItem('av_key') || '8CWC4MJFBVMYX2FN';
 let watchlist = [];
 let callsToday = 0;
-let currentOvData = null;
 let currentTicker = '';
 
-// ── Smart competitor map by ticker ──
 const TICKER_COMPETITORS = {
-  // Semiconductors
   'INTC':['TSM','AMD','NVDA'],'AMD':['INTC','NVDA','TSM'],'NVDA':['AMD','INTC','TSM'],
   'TSM':['INTC','ASML','AMAT'],'QCOM':['AVGO','MRVL','AMD'],'AVGO':['QCOM','TXN','ADI'],
-  // Big Tech
   'AAPL':['MSFT','GOOGL','META'],'MSFT':['AAPL','GOOGL','AMZN'],
   'GOOGL':['META','MSFT','AMZN'],'META':['GOOGL','SNAP','PINS'],
-  'AMZN':['MSFT','GOOGL','BABA'],'TSLA':['GM','F','BYD'],
+  'AMZN':['MSFT','GOOGL','WMT'],'TSLA':['GM','F','RIVN'],
   'NFLX':['DIS','PARA','WBD'],
-  // Finance
   'JPM':['BAC','WFC','GS'],'BAC':['JPM','WFC','C'],'GS':['MS','JPM','BLK'],
   'V':['MA','AXP','PYPL'],'MA':['V','AXP','PYPL'],
-  // Consumer
-  'KO':['PEP','MNST','KDRFY'],'PEP':['KO','MNST','MDLZ'],
+  'KO':['PEP','MNST','KDP'],'PEP':['KO','MNST','MDLZ'],
   'MCD':['YUM','QSR','SBUX'],'SBUX':['MCD','DNKN','QSR'],
   'WMT':['COST','TGT','AMZN'],'COST':['WMT','TGT','BJ'],
-  // Healthcare
   'JNJ':['PFE','MRK','ABT'],'PFE':['JNJ','MRK','ABBV'],
   'UNH':['CVS','CI','HUM'],
-  // Energy
   'XOM':['CVX','COP','BP'],'CVX':['XOM','COP','SLB'],
-  // Industrial
-  'BA':['LMT','RTX','NOC'],'CAT':['DE','AGCO','CNH'],
+  'BA':['LMT','RTX','NOC'],'CAT':['DE','HON','MMM'],
 };
 
-// Sector fallback
 const SECTOR_COMPETITORS = {
   'Technology':['AAPL','MSFT','GOOGL'],'Semiconductors':['NVDA','AMD','INTC'],
   'Consumer Staples':['KO','PEP','PG'],'Consumer Discretionary':['AMZN','TGT','HD'],
@@ -234,45 +208,26 @@ const SECTOR_COMPETITORS = {
   'Communication Services':['GOOGL','META','NFLX'],
 };
 
-try {
-  watchlist = JSON.parse(localStorage.getItem('buffett_wl')||'[]');
-  const today = new Date().toDateString();
-  const saved = JSON.parse(localStorage.getItem('av_quota')||'{"date":"","calls":0}');
-  callsToday = saved.date===today ? saved.calls : 0;
-} catch(e){}
+try{
+  watchlist=JSON.parse(localStorage.getItem('buffett_wl')||'[]');
+  const today=new Date().toDateString();
+  const saved=JSON.parse(localStorage.getItem('av_quota')||'{"date":"","calls":0}');
+  callsToday=saved.date===today?saved.calls:0;
+}catch(e){}
 
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').then(reg=>{
-    // Check for updates every time the page loads
-    reg.update();
-    // When a new service worker is found, notify the user
-    reg.addEventListener('updatefound',()=>{
-      const newSW=reg.installing;
-      newSW.addEventListener('statechange',()=>{
-        if(newSW.state==='installed'&&navigator.serviceWorker.controller){
-          // New version available — show update banner
-          const banner=document.createElement('div');
-          banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#1d4ed8;color:white;padding:12px 16px;font-size:13px;font-weight:600;text-align:center;display:flex;justify-content:center;align-items:center;gap:10px';
-          banner.innerHTML='New version available! <button onclick="location.reload()" style="background:white;color:#1d4ed8;border:none;border-radius:8px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">Update Now</button>';
-          document.body.prepend(banner);
-        }
-      });
-    });
-  }).catch(()=>{});
-}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 function saveQuota(){
   localStorage.setItem('av_quota',JSON.stringify({date:new Date().toDateString(),calls:callsToday}));
   const rem=25-callsToday;
-  document.getElementById('quotaBar').textContent=`📊 API calls: ${callsToday}/25  (${rem} remaining today)`;
+  document.getElementById('quotaBar').textContent=`📊 API calls: ${callsToday}/25  (${rem} remaining · ~${Math.floor(rem/6)} stocks left)`;
   const sq=document.getElementById('settingsQuota');
-  if(sq) sq.textContent=`${callsToday} used · ${rem} remaining`;
+  if(sq) sq.textContent=`${callsToday} used · ${rem} remaining · ~${Math.floor(rem/6)} stocks left`;
 }
 saveQuota();
 
 function setStatus(msg,color='#93c5fd'){
-  const b=document.getElementById('statusBar');
-  b.textContent=msg; b.style.color=color;
+  const b=document.getElementById('statusBar');b.textContent=msg;b.style.color=color;
 }
 
 function showPage(name){
@@ -281,7 +236,7 @@ function showPage(name){
   document.getElementById('page-'+name).classList.add('active');
   document.getElementById('nav-'+name).classList.add('active');
   if(name==='watchlist') renderWatchlist();
-  if(name==='settings'){document.getElementById('apiKeyInput').value=AV_KEY; saveQuota();}
+  if(name==='settings'){document.getElementById('apiKeyInput').value=AV_KEY;saveQuota();}
 }
 
 function saveApiKey(){
@@ -292,9 +247,7 @@ function saveApiKey(){
 
 function clearWatchlist(){
   if(confirm('Clear all watchlist stocks?')){
-    watchlist=[];
-    localStorage.setItem('buffett_wl','[]');
-    renderWatchlist();
+    watchlist=[];localStorage.setItem('buffett_wl','[]');renderWatchlist();
   }
 }
 
@@ -315,31 +268,60 @@ async function avFetch(fn,params){
   const res=await fetch(url);
   if(!res.ok) throw new Error(`Network error ${res.status}`);
   const data=await res.json();
-  if(data['Note']) throw new Error('Rate limit hit (5 calls/min). Wait 60s and retry.');
-  if(data['Information']){
-    const info=data['Information'];
-    if(info.includes('rate limit')) throw new Error('Daily limit reached (25/day). Come back tomorrow!');
-    if(info.includes('premium')) throw new Error('This endpoint requires a premium API key.');
-    throw new Error(info.length>120?info.substring(0,120)+'...':info);
-  }
+  if(data['Note']) throw new Error('Rate limit. Wait 1 min.');
+  if(data['Information']) throw new Error('Daily limit reached (25/day). Come back tomorrow!');
   return data;
 }
 
 function n(v){return parseFloat(v)||0;}
 
-// ── Recalculate DCF with custom inputs ──
+// ── Refresh just the price (1 API call) ──
+async function refreshPrice(ticker){
+  if(callsToday>=24){alert('Daily API limit reached');return;}
+  setStatus(`⏳ Refreshing ${ticker} price...`,'#fde68a');
+  try{
+    const q=await avFetch('GLOBAL_QUOTE',`symbol=${ticker}`);
+    callsToday++;saveQuota();
+    const gq=q['Global Quote']||{};
+    const price=n(gq['05. price']);
+    const change=n(gq['09. change']);
+    const changePct=n((gq['10. change percent']||'0').replace('%',''));
+    const tradeDate=gq['07. latest trading day']||'';
+    if(price>0){
+      const priceEl=document.getElementById('livePrice');
+      const changeEl=document.getElementById('priceChange');
+      const dateEl=document.getElementById('priceDate');
+      if(priceEl) priceEl.textContent=`$${price.toFixed(2)}`;
+      if(changeEl){
+        changeEl.textContent=`${change>=0?'▲':'▼'} $${Math.abs(change).toFixed(2)} (${Math.abs(changePct).toFixed(2)}%)`;
+        changeEl.className=change>=0?'up':'down';
+        changeEl.style.fontSize='13px';
+        changeEl.style.fontWeight='700';
+      }
+      if(dateEl) dateEl.textContent=`Updated: ${tradeDate}`;
+      // update DCF calculator price too
+      const dcfPrice=document.getElementById('dcf_price');
+      if(dcfPrice) dcfPrice.value=price.toFixed(2);
+      setStatus(`✅ ${ticker} price refreshed: $${price.toFixed(2)}`,'#86efac');
+    }
+  }catch(err){
+    setStatus('❌ '+err.message,'#fca5a5');
+    alert(err.message);
+  }
+}
+
 function recalcDCF(){
-  const eps    = parseFloat(document.getElementById('dcf_eps').value)||0;
-  const growth = parseFloat(document.getElementById('dcf_growth').value)/100||0.08;
-  const term   = parseFloat(document.getElementById('dcf_term').value)/100||0.03;
-  const disc   = parseFloat(document.getElementById('dcf_disc').value)/100||0.10;
-  const yrs    = parseInt(document.getElementById('dcf_yrs').value)||10;
-  const price  = parseFloat(document.getElementById('dcf_price').value)||0;
+  const eps=parseFloat(document.getElementById('dcf_eps').value)||0;
+  const growth=parseFloat(document.getElementById('dcf_growth').value)/100||0.08;
+  const term=parseFloat(document.getElementById('dcf_term').value)/100||0.03;
+  const disc=parseFloat(document.getElementById('dcf_disc').value)/100||0.10;
+  const yrs=parseInt(document.getElementById('dcf_yrs').value)||10;
+  const price=parseFloat(document.getElementById('dcf_price').value)||0;
 
   let iv=0;
   const rows=[];
   if(eps>0){
-    let cf=eps, pvSum=0;
+    let cf=eps,pvSum=0;
     for(let i=1;i<=yrs;i++){
       cf*=(1+growth);
       const pv=cf/Math.pow(1+disc,i);
@@ -350,10 +332,9 @@ function recalcDCF(){
     const tv=(cf*(1+term))/(disc-term);
     const pvt=tv/Math.pow(1+disc,yrs);
     iv=pvSum+pvt;
-    rows.push(`Terminal Value → PV=$${pvt.toFixed(2)}`);
+    rows.push(`Terminal → PV=$${pvt.toFixed(2)}`);
   }
-
-  const mos = price>0&&iv>0 ? ((iv-price)/iv)*100 : null;
+  const mos=price>0&&iv>0?((iv-price)/iv)*100:null;
 
   document.getElementById('dcf-result-area').innerHTML=`
     <div class="dcf-result-box">
@@ -364,252 +345,76 @@ function recalcDCF(){
       <div class="dcf-row"><span style="color:#6b7280">Verdict</span><span style="font-weight:800;color:${mos===null?'#9ca3af':mos>=30?'#16a34a':mos>=0?'#d97706':'#dc2626'}">${mos===null?'N/A':mos>=30?'🟢 Buy Zone':mos>=10?'🟡 Fair Value':mos>=0?'🟡 Slightly Overvalued':'🔴 Overvalued'}</span></div>
     </div>
     <div class="dcf-formula">
-      <strong>Formula:</strong> IV = Σ[EPS×(1+g)ⁿ/(1+r)ⁿ] + Terminal Value/(1+r)ⁿ<br/><br/>
-      <strong>Year-by-year breakdown:</strong><br/>
-      ${rows.join('<br/>')}
+      <strong>Formula:</strong> IV = Σ[EPS×(1+g)ⁿ/(1+r)ⁿ] + TV/(1+r)ⁿ<br/><br/>
+      <strong>Year-by-year:</strong><br/>${rows.join('<br/>')}
     </div>`;
 }
 
-// ── Apply backtest suggested params ──
-function applyBacktestParams(growth, disc){
-  document.getElementById('dcf_growth').value=(growth*100).toFixed(1);
-  document.getElementById('dcf_disc').value=(disc*100).toFixed(1);
-  recalcDCF();
-  document.getElementById('cc-dcfcalc').scrollIntoView({behavior:'smooth'});
-}
-
-// ── Generate backtest HTML from historical data ──
-function generateBacktestHtml(earningsData, monthlyPrices, fallbackPrice){
-  if(!earningsData||!monthlyPrices)
-    return '<div style="font-size:12px;color:#9ca3af;text-align:center;padding:12px">Historical data unavailable</div>';
-
-  const now=new Date();
-  const qe=earningsData?.quarterlyEarnings||[];
-  const ps=monthlyPrices?.['Monthly Time Series']||monthlyPrices?.['Monthly Adjusted Time Series']||{};
-  const pDates=Object.keys(ps).sort((a,b)=>new Date(b)-new Date(a));
-
-  if(!pDates.length||qe.length<4)
-    return '<div style="font-size:12px;color:#9ca3af;text-align:center;padding:12px">Insufficient historical data for backtesting</div>';
-
-  const latestClose=parseFloat(ps[pDates[0]]?.['4. close']||0);
-  const actualCurrent=latestClose>0?latestClose:fallbackPrice;
-
-  function getPriceAt(td){
-    let closest=null,minD=Infinity;
-    for(const d of pDates){const diff=Math.abs(new Date(d)-td);if(diff<minD){minD=diff;closest=d;}}
-    return closest?parseFloat(ps[closest]['4. close']||0):0;
-  }
-  function getTTMEPS(td){
-    const rel=qe.filter(q=>new Date(q.fiscalDateEnding)<=td).slice(0,4);
-    if(rel.length<4) return null;
-    return rel.reduce((s,q)=>s+(parseFloat(q.reportedEPS)||0),0);
-  }
-  function getGrowthAt(td){
-    const b=qe.filter(q=>new Date(q.fiscalDateEnding)<=td);
-    if(b.length<8) return 0.08;
-    const r4=b.slice(0,4).reduce((s,q)=>s+(parseFloat(q.reportedEPS)||0),0);
-    const p4=b.slice(4,8).reduce((s,q)=>s+(parseFloat(q.reportedEPS)||0),0);
-    if(p4<=0) return 0.08;
-    return Math.min(Math.max((r4-p4)/Math.abs(p4),0.03),0.25);
-  }
-  function calcDCF(eps,growth,disc,termG,yrs){
-    if(eps<=0) return 0;
-    let iv=0,cf=eps;
-    for(let i=1;i<=yrs;i++){cf*=(1+growth);iv+=cf/Math.pow(1+disc,i);}
-    iv+=(cf*(1+termG)/(disc-termG))/Math.pow(1+disc,yrs);
-    return iv;
-  }
-
-  const periods=[
-    {label:'3M',months:3},{label:'6M',months:6},{label:'1Y',months:12},
-    {label:'2Y',months:24},{label:'3Y',months:36},{label:'5Y',months:60}
-  ];
-  const disc=0.10,termG=0.03,yrs=10;
-  const results=[];
-
-  for(const p of periods){
-    const pd=new Date(now);pd.setMonth(pd.getMonth()-p.months);
-    const eps=getTTMEPS(pd), price=getPriceAt(pd), growth=getGrowthAt(pd);
-    if(!eps||eps<=0||!price) continue;
-    const dcfVal=calcDCF(eps,growth,disc,termG,yrs);
-    const err=actualCurrent>0?((dcfVal-actualCurrent)/actualCurrent*100):0;
-    const priceChg=price>0?((actualCurrent-price)/price*100):0;
-    // implied growth via binary search
-    let lo=0.001,hi=0.40;
-    for(let it=0;it<60;it++){const mid=(lo+hi)/2;if(calcDCF(eps,mid,disc,termG,yrs)>actualCurrent) hi=mid; else lo=mid;}
-    results.push({label:p.label,date:pd.toISOString().substring(0,10),eps,growth,price,dcfVal,err,priceChg,impliedG:(lo+hi)/2});
-  }
-
-  if(!results.length)
-    return '<div style="font-size:12px;color:#9ca3af;text-align:center;padding:12px">Insufficient historical earnings data for backtesting</div>';
-
-  // Weighted average implied growth (recent periods weighted more)
-  const wts=results.map((_,i)=>1/(i+1)),totalW=wts.reduce((a,b)=>a+b,0);
-  const sugG=Math.min(Math.max(results.reduce((s,r,i)=>s+r.impliedG*wts[i],0)/totalW,0.03),0.25);
-  const avgErr=results.reduce((s,r)=>s+r.err,0)/results.length;
-  let sugD=0.10;
-  if(avgErr>20) sugD=0.12; else if(avgErr>10) sugD=0.11;
-  else if(avgErr<-20) sugD=0.08; else if(avgErr<-10) sugD=0.09;
-
-  let h=`<div style="font-size:12px;color:#6b7280;margin-bottom:10px;line-height:1.6">
-    Using historical EPS & growth from each past time point to calculate DCF intrinsic value, then comparing with today's actual price (<strong>$${actualCurrent.toFixed(2)}</strong>).
-  </div>
-  <div style="overflow-x:auto"><table class="bt-table"><thead><tr>
-    <th>Period</th><th>Date</th><th>TTM EPS</th><th>Growth</th><th>Past Price</th><th>Price Chg</th><th>DCF Value</th><th>Error</th><th>Implied G</th>
-  </tr></thead><tbody>`;
-
-  for(const r of results){
-    const ec=r.err>0?'bt-error-pos':'bt-error-neg';
-    const pc=r.priceChg>0?'color:#16a34a':'color:#dc2626';
-    h+=`<tr>
-      <td style="font-weight:700">${r.label}</td>
-      <td>${r.date}</td>
-      <td>$${r.eps.toFixed(2)}</td>
-      <td>${(r.growth*100).toFixed(1)}%</td>
-      <td>$${r.price.toFixed(2)}</td>
-      <td style="${pc};font-weight:600">${r.priceChg>0?'+':''}${r.priceChg.toFixed(1)}%</td>
-      <td style="font-weight:700">$${r.dcfVal.toFixed(2)}</td>
-      <td class="${ec}">${r.err>0?'+':''}${r.err.toFixed(1)}%</td>
-      <td style="color:#0369a1;font-weight:600">${(r.impliedG*100).toFixed(1)}%</td>
-    </tr>`;
-  }
-
-  h+=`</tbody></table></div>
-  <div style="font-size:10px;color:#9ca3af;margin-bottom:12px;line-height:1.5">
-    <strong>Error</strong> = (DCF Value − Actual Price) / Actual Price<br/>
-    <strong>Implied G</strong> = growth rate needed for DCF to match actual current price<br/>
-    <strong>Price Chg</strong> = actual stock price change from that time to now
-  </div>
-  <div class="bt-suggest">
-    <h4>🎯 Calibrated Parameters (Based on Historical Accuracy)</h4>
-    <div class="bt-suggest-row"><span>Suggested Growth Rate</span><span style="font-weight:700;color:#166534">${(sugG*100).toFixed(1)}%</span></div>
-    <div class="bt-suggest-row"><span>Suggested Discount Rate</span><span style="font-weight:700;color:#166534">${(sugD*100).toFixed(1)}%</span></div>
-    <div class="bt-suggest-row"><span>Avg Historical Error</span><span class="${avgErr>0?'bt-error-pos':'bt-error-neg'}">${avgErr>0?'+':''}${avgErr.toFixed(1)}%</span></div>
-    <div style="font-size:11px;color:#6b7280;margin-top:8px;line-height:1.5">
-      ${avgErr>15?'⚠️ DCF historically overestimates — model is too optimistic. Consider higher discount rate or lower growth.':
-        avgErr<-15?'📈 DCF historically underestimates — market values this stock higher than the model predicts.':
-        avgErr>5?'⚠️ DCF slightly overestimates — minor parameter adjustment recommended.':
-        avgErr<-5?'📈 DCF slightly underestimates — the stock outperforms model expectations.':
-        '✅ DCF estimates have been relatively accurate historically — current parameters are reasonable.'}
-    </div>
-    <button class="bt-apply-btn" onclick="applyBacktestParams(${sugG.toFixed(4)},${sugD.toFixed(2)})">📐 Apply Calibrated Parameters to DCF Calculator</button>
-  </div>`;
-  return h;
-}
-
-// ── Load backtest data on demand ──
-async function loadBacktest(ticker, estPrice){
-  const container=document.getElementById('bt-content');
-  container.innerHTML='<div style="text-align:center;padding:20px"><div class="spinner"></div><div style="font-size:12px;color:#92400e;margin-top:8px">Loading historical data (2 API calls)...</div></div>';
-  try{
-    if(callsToday>=24){
-      container.innerHTML='<div style="font-size:12px;color:#dc2626;text-align:center;padding:12px">⚠️ API quota too low. Need 2 calls for backtest. Try again tomorrow.</div>';
-      return;
-    }
-    // Fetch earnings data
-    let earningsData=null, monthlyPrices=null;
-    try{
-      earningsData=await avFetch('EARNINGS',`symbol=${ticker}`);
-      callsToday++;saveQuota();
-    }catch(e1){
-      container.innerHTML=`<div style="font-size:12px;color:#dc2626;text-align:center;padding:12px">❌ EARNINGS endpoint error: ${e1.message}<br/><span style="color:#9ca3af;font-size:11px;margin-top:4px;display:block">This endpoint may require a premium API key. You can get one at alphavantage.co</span></div>`;
-      return;
-    }
-    // Wait 15s to avoid per-minute rate limit (free tier: 5 calls/min)
-    container.querySelector('div:last-child').textContent='Waiting for rate limit cooldown (15s)...';
-    await new Promise(r=>setTimeout(r,15000));
-    // Fetch monthly prices
-    try{
-      monthlyPrices=await avFetch('TIME_SERIES_MONTHLY',`symbol=${ticker}`);
-      callsToday++;saveQuota();
-    }catch(e2){
-      container.innerHTML=`<div style="font-size:12px;color:#dc2626;text-align:center;padding:12px">❌ TIME_SERIES_MONTHLY error: ${e2.message}<br/><span style="color:#9ca3af;font-size:11px;margin-top:4px;display:block">Try again in 1 minute if this is a rate limit issue.</span></div>`;
-      return;
-    }
-    container.innerHTML=generateBacktestHtml(earningsData,monthlyPrices,estPrice);
-  }catch(e){
-    container.innerHTML=`<div style="font-size:12px;color:#dc2626;text-align:center;padding:12px">❌ ${e.message}</div>`;
-  }
-}
-
-// ── Generate AI Commentary ──
-function generateCommentary(ticker, ov, compDataArr){
-  const name      = ov['Name']||ticker;
-  const sector    = ov['Sector']||'';
-  const industry  = ov['Industry']||'';
-  const roe       = n(ov['ReturnOnEquityTTM'])*100;
-  const netMargin = n(ov['ProfitMargin'])*100;
-  const opMargin  = n(ov['OperatingMarginTTM'])*100;
-  const revGrowth = n(ov['QuarterlyRevenueGrowthYOY'])*100;
-  const earningsG = n(ov['QuarterlyEarningsGrowthYOY'])*100;
-  const debtToEq  = n(ov['DebtToEquity'])/100;
-  const pegRatio  = n(ov['PEGRatio']);
-  const peRatio   = n(ov['PERatio']);
-  const beta      = n(ov['Beta']);
-  const divYield  = n(ov['DividendYield'])*100;
-  const roa       = n(ov['ReturnOnAssetsTTM'])*100;
-  const eps       = n(ov['EPS']);
-  const forwardPE = n(ov['ForwardPE']);
-
-  // Compare ROE vs competitors
-  const compROEs  = compDataArr.map(c=>n(c.data['ReturnOnEquityTTM'])*100);
-  const avgCompROE= compROEs.length>0 ? compROEs.reduce((a,b)=>a+b,0)/compROEs.length : 0;
-  const compNames = compDataArr.map(c=>c.ticker).join(', ');
-  const compPEs   = compDataArr.map(c=>n(c.data['PERatio'])).filter(v=>v>0);
-  const avgCompPE = compPEs.length>0 ? compPEs.reduce((a,b)=>a+b,0)/compPEs.length : 0;
+function generateCommentary(ticker,ov,compDataArr,currentPrice,analystTgt){
+  const name=ov['Name']||ticker;
+  const sector=ov['Sector']||'';
+  const roe=n(ov['ReturnOnEquityTTM'])*100;
+  const netMargin=n(ov['ProfitMargin'])*100;
+  const opMargin=n(ov['OperatingMarginTTM'])*100;
+  const revGrowth=n(ov['QuarterlyRevenueGrowthYOY'])*100;
+  const earningsG=n(ov['QuarterlyEarningsGrowthYOY'])*100;
+  const debtToEq=n(ov['DebtToEquity'])/100;
+  const pegRatio=n(ov['PEGRatio']);
+  const peRatio=n(ov['PERatio']);
+  const divYield=n(ov['DividendYield'])*100;
+  const roa=n(ov['ReturnOnAssetsTTM'])*100;
+  const compROEs=compDataArr.map(c=>n(c.data['ReturnOnEquityTTM'])*100);
+  const avgCompROE=compROEs.length>0?compROEs.reduce((a,b)=>a+b,0)/compROEs.length:0;
+  const compNames=compDataArr.map(c=>c.ticker).join(', ');
+  const compPEs=compDataArr.map(c=>n(c.data['PERatio'])).filter(v=>v>0);
+  const avgCompPE=compPEs.length>0?compPEs.reduce((a,b)=>a+b,0)/compPEs.length:0;
   const compMargins=compDataArr.map(c=>n(c.data['ProfitMargin'])*100);
   const avgCompMargin=compMargins.length>0?compMargins.reduce((a,b)=>a+b,0)/compMargins.length:0;
+  const upside=currentPrice>0&&analystTgt>0?((analystTgt-currentPrice)/currentPrice)*100:0;
 
-  // ── Future Trend ──
-  let trendRating, trendText;
+  let trendRating,trendText;
   if(revGrowth>15&&earningsG>15){
-    trendRating='strong'; trendText=`${name} shows strong momentum with ${revGrowth.toFixed(1)}% revenue growth and ${earningsG.toFixed(1)}% earnings growth YoY, significantly above industry average. This trajectory suggests continued market share expansion and pricing power. ${sector==='Technology'?'The ongoing AI and digital transformation tailwinds provide additional runway for growth.':sector==='Health Care'?'Demographics and innovation cycles support sustained demand.':''} Compared to ${compNames}, ${name} ${revGrowth>15?'is growing faster':'maintains competitive growth'}, making it well-positioned for the next 3–5 years.`;
+    trendRating='strong';trendText=`${name} shows strong momentum with ${revGrowth.toFixed(1)}% revenue growth and ${earningsG.toFixed(1)}% earnings growth YoY, significantly above industry average. ${sector==='Technology'?'AI and digital transformation tailwinds provide growth runway.':sector==='Health Care'?'Demographics and innovation cycles support sustained demand.':''} Compared to ${compNames}, ${name} ${revGrowth>15?'is growing faster':'maintains competitive growth'}. Well-positioned for 3–5 years.`;
   } else if(revGrowth>5||earningsG>5){
-    trendRating='moderate'; trendText=`${name} shows moderate growth with ${revGrowth.toFixed(1)}% revenue growth YoY. While not explosive, this steady trajectory indicates a stable business. Compared to peers (${compNames}), the company maintains a competitive but not leading position. Investors should monitor whether growth accelerates or decelerates over the next 2–3 quarters.`;
+    trendRating='moderate';trendText=`${name} shows moderate growth with ${revGrowth.toFixed(1)}% revenue growth YoY. Compared to peers (${compNames}), the company maintains a competitive but not leading position. Watch for acceleration or deceleration over next 2-3 quarters.`;
   } else {
-    trendRating='weak'; trendText=`${name}'s growth trajectory shows signs of slowing — revenue growth of ${revGrowth.toFixed(1)}% and earnings growth of ${earningsG.toFixed(1)}% lag behind competitive expectations. Compared to ${compNames}, the company faces headwinds that could pressure future returns. This warrants caution unless management demonstrates a credible turnaround strategy.`;
+    trendRating='weak';trendText=`${name}'s growth trajectory shows signs of slowing — revenue growth ${revGrowth.toFixed(1)}% and earnings growth ${earningsG.toFixed(1)}% lag expectations. Compared to ${compNames}, the company faces headwinds. Caution warranted unless management shows credible turnaround.`;
   }
 
-  // ── Management Competence ──
-  let mgmtRating, mgmtText;
+  let mgmtRating,mgmtText;
   const mgmtScore=(roe>=15?1:0)+(roa>=5?1:0)+(opMargin>=15?1:0)+(debtToEq<0.5?1:0);
   if(mgmtScore>=3){
-    mgmtRating='strong'; mgmtText=`Management at ${name} demonstrates strong capital allocation with ROE of ${roe.toFixed(1)}% (vs peer average ${avgCompROE.toFixed(1)}%) and operating margin of ${opMargin.toFixed(1)}%. ${debtToEq<0.5?`The conservative debt/equity ratio of ${debtToEq.toFixed(2)} shows disciplined financial management.`:`Debt levels are manageable.`} ROA of ${roa.toFixed(1)}% indicates efficient use of assets — a key Buffett criterion for identifying excellent management teams.`;
+    mgmtRating='strong';mgmtText=`Management at ${name} demonstrates strong capital allocation — ROE ${roe.toFixed(1)}% (vs peers ${avgCompROE.toFixed(1)}%), operating margin ${opMargin.toFixed(1)}%. ${debtToEq<0.5?`Conservative debt/equity ${debtToEq.toFixed(2)} shows financial discipline.`:''} ROA ${roa.toFixed(1)}% indicates efficient asset use — a key Buffett criterion.`;
   } else if(mgmtScore>=2){
-    mgmtRating='moderate'; mgmtText=`${name}'s management shows mixed results. ROE of ${roe.toFixed(1)}% and operating margin of ${opMargin.toFixed(1)}% are ${roe>=15&&opMargin>=15?'both solid':'inconsistent'} compared to peers (${compNames}). ${debtToEq>1?`The debt/equity ratio of ${debtToEq.toFixed(2)} warrants monitoring.`:'Balance sheet management appears reasonable.'} Investors should look for consistent improvement in capital efficiency over the next 2–3 years.`;
+    mgmtRating='moderate';mgmtText=`${name}'s management shows mixed results. ROE ${roe.toFixed(1)}% and operating margin ${opMargin.toFixed(1)}% are ${roe>=15&&opMargin>=15?'solid':'inconsistent'} vs peers (${compNames}). ${debtToEq>1?`Debt/equity ${debtToEq.toFixed(2)} warrants monitoring.`:''} Look for consistent improvement.`;
   } else {
-    mgmtRating='weak'; mgmtText=`Management efficiency metrics at ${name} raise concerns — ROE of ${roe.toFixed(1)}% and ROA of ${roa.toFixed(1)}% trail the peer average. Operating margin of ${opMargin.toFixed(1)}% suggests possible cost structure challenges. Buffett would likely scrutinize whether current leadership has a credible plan to improve returns on capital relative to competitors like ${compNames}.`;
+    mgmtRating='weak';mgmtText=`Management efficiency at ${name} raises concerns — ROE ${roe.toFixed(1)}% and ROA ${roa.toFixed(1)}% trail peer average. Operating margin ${opMargin.toFixed(1)}% suggests cost structure challenges. Buffett would scrutinize leadership's plan to improve capital returns vs ${compNames}.`;
   }
 
-  // ── Competitive Position ──
-  let compRating, compText;
-  const marginBetter = netMargin > avgCompMargin;
-  const roeBetter    = roe > avgCompROE;
-  const valuationBetter = avgCompPE>0 && peRatio<avgCompPE;
+  let compRating,compText;
+  const marginBetter=netMargin>avgCompMargin;
+  const roeBetter=roe>avgCompROE;
+  const valuationBetter=avgCompPE>0&&peRatio<avgCompPE;
   const compScore=(marginBetter?1:0)+(roeBetter?1:0)+(valuationBetter?1:0);
   if(compScore>=2){
-    compRating='strong'; compText=`${name} holds a competitive advantage over ${compNames}. ${marginBetter?`Its net margin of ${netMargin.toFixed(1)}% exceeds the peer average of ${avgCompMargin.toFixed(1)}%, indicating superior pricing power or cost efficiency.`:''} ${roeBetter?`ROE of ${roe.toFixed(1)}% outperforms the competitive average of ${avgCompROE.toFixed(1)}%.`:''} ${valuationBetter?`Relative valuation at P/E ${peRatio.toFixed(1)}x is more attractive than the peer average of ${avgCompPE.toFixed(1)}x.`:''} This combination aligns with Buffett's focus on businesses with durable moats.`;
+    compRating='strong';compText=`${name} holds competitive advantages over ${compNames}. ${marginBetter?`Net margin ${netMargin.toFixed(1)}% exceeds peer average ${avgCompMargin.toFixed(1)}% — pricing power or cost efficiency.`:''} ${roeBetter?`ROE ${roe.toFixed(1)}% beats peers' ${avgCompROE.toFixed(1)}%.`:''} ${valuationBetter?`P/E ${peRatio.toFixed(1)}x more attractive than peers' ${avgCompPE.toFixed(1)}x.`:''} Aligns with Buffett's moat focus.`;
   } else if(compScore===1){
-    compRating='moderate'; compText=`${name} is competitively positioned but not dominant versus ${compNames}. Net margin of ${netMargin.toFixed(1)}% is ${marginBetter?'above':'below'} peer average of ${avgCompMargin.toFixed(1)}%. The company has some competitive strengths but also faces meaningful competition that could limit pricing power and margin expansion.`;
+    compRating='moderate';compText=`${name} is competitively positioned but not dominant vs ${compNames}. Net margin ${netMargin.toFixed(1)}% is ${marginBetter?'above':'below'} peer average ${avgCompMargin.toFixed(1)}%. Some strengths but meaningful competition limits pricing power.`;
   } else {
-    compRating='weak'; compText=`${name} appears to be in a weaker competitive position relative to ${compNames}. Net margin of ${netMargin.toFixed(1)}% trails the peer average of ${avgCompMargin.toFixed(1)}%, suggesting limited pricing power. Buffett would question whether the company has a durable moat to protect long-term returns. Investors should assess whether competitive pressures are structural or temporary.`;
+    compRating='weak';compText=`${name} appears weaker vs ${compNames}. Net margin ${netMargin.toFixed(1)}% trails peer average ${avgCompMargin.toFixed(1)}% — limited pricing power. Buffett would question durability of moat. Assess if pressure is structural or temporary.`;
   }
 
-  // ── Buffett Verdict ──
-  const overallScore = (trendRating==='strong'?3:trendRating==='moderate'?2:1)
-    +(mgmtRating==='strong'?3:mgmtRating==='moderate'?2:1)
-    +(compRating==='strong'?3:compRating==='moderate'?2:1);
-
+  const overallScore=(trendRating==='strong'?3:trendRating==='moderate'?2:1)+(mgmtRating==='strong'?3:mgmtRating==='moderate'?2:1)+(compRating==='strong'?3:compRating==='moderate'?2:1);
   let buffettVerdict;
   if(overallScore>=8){
-    buffettVerdict=`${name} exhibits many qualities Buffett looks for — strong growth, excellent management, and competitive advantages. ${pegRatio>0&&pegRatio<1?`The PEG ratio of ${pegRatio.toFixed(2)} suggests the stock may be undervalued relative to its growth.`:''} ${divYield>0?`The ${divYield.toFixed(2)}% dividend yield adds to total return.`:''} This appears to be the type of "wonderful company at a fair price" Buffett describes.`;
+    buffettVerdict=`${name} exhibits many qualities Buffett looks for — strong growth, excellent management, competitive advantages. ${pegRatio>0&&pegRatio<1?`PEG ${pegRatio.toFixed(2)} suggests undervaluation vs growth.`:''} ${divYield>0?`${divYield.toFixed(2)}% dividend adds total return.`:''} ${upside>10?`Current price shows ${upside.toFixed(1)}% upside to analyst target.`:''} Appears to be "wonderful company at fair price."`;
   } else if(overallScore>=6){
-    buffettVerdict=`${name} is a decent business with some attractive qualities but also notable weaknesses. Buffett would likely want to see improvement in ${roe<15?'return on equity ':''} ${netMargin<10?'profit margins ':''} before considering it a "wonderful company." It may be suitable for patient investors willing to wait for business improvement or a better entry price.`;
+    buffettVerdict=`${name} is a decent business with attractive qualities but notable weaknesses. Buffett would want improvement in ${roe<15?'ROE ':''}${netMargin<10?'margins ':''}before calling it "wonderful." Suitable for patient investors. ${upside>0?`Current analyst upside: ${upside.toFixed(1)}%.`:''}`;
   } else {
-    buffettVerdict=`Based on Buffett's criteria, ${name} currently faces too many challenges — ${revGrowth<5?'slowing growth, ':''} ${roe<15?'below-target returns, ':''} ${debtToEq>1?'elevated debt ':''} — to qualify as a strong value investment. Buffett would likely "put it in the too-hard pile" and look for better opportunities among its competitors.`;
+    buffettVerdict=`Based on Buffett's criteria, ${name} faces too many challenges — ${revGrowth<5?'slowing growth, ':''}${roe<15?'below-target returns, ':''}${debtToEq>1?'elevated debt ':''}— to qualify as strong value. Buffett would "put in too-hard pile" and look for better opportunities among competitors.`;
   }
 
-  const ratingHtml = r=>`<span class="rating-pill ${r==='strong'?'rating-strong':r==='moderate'?'rating-moderate':'rating-weak'}">${r==='strong'?'✅ Strong':r==='moderate'?'⚠️ Moderate':'❌ Weak'}</span>`;
+  const ratingHtml=r=>`<span class="rating-pill ${r==='strong'?'rating-strong':r==='moderate'?'rating-moderate':'rating-weak'}">${r==='strong'?'✅ Strong':r==='moderate'?'⚠️ Moderate':'❌ Weak'}</span>`;
 
   return `
     <div class="commentary-section">
@@ -633,9 +438,9 @@ function generateCommentary(ticker, ov, compDataArr){
 async function analyzeStock(){
   const ticker=document.getElementById('tickerInput').value.trim().toUpperCase();
   if(!ticker){alert('Please enter a ticker');return;}
-  if(callsToday>=22){
+  if(callsToday>=20){
     document.getElementById('results').innerHTML=`<div class="error-box" style="margin-top:16px">
-      <h3>⏰ API Limit Low</h3><p>Only ${25-callsToday} calls left today. Come back tomorrow or add a new key in Settings.</p></div>`;
+      <h3>⏰ API Limit Low</h3><p>Only ${25-callsToday} calls left — not enough for full analysis (needs ~6). Come back tomorrow.</p></div>`;
     return;
   }
 
@@ -644,27 +449,41 @@ async function analyzeStock(){
   const results=document.getElementById('results');
   results.innerHTML=`<div class="loading"><div class="spinner"></div>
     <p>Analyzing <strong>${ticker}</strong></p>
-    <div class="step" id="loadStep">Fetching overview...</div></div>`;
+    <div class="step" id="loadStep">Fetching live price...</div></div>`;
   setStatus(`⏳ Analyzing ${ticker}...`,'#fde68a');
 
   function setStep(msg){const s=document.getElementById('loadStep');if(s)s.textContent=msg;}
 
   try{
-    // ── Call 1: Main overview ──
-    setStep('📊 Company overview (1/4)...');
-    const ov=await avFetch('OVERVIEW',`symbol=${ticker}`);
-    callsToday++; saveQuota();
-    if(!ov['Name']) throw new Error(`"${ticker}" not found. Try AAPL, INTC, MSFT, KO`);
-    currentOvData=ov;
+    // ── CALL 1: Live Price ──
+    setStep('💹 Live stock price (1/6)...');
+    const quote=await avFetch('GLOBAL_QUOTE',`symbol=${ticker}`);
+    callsToday++;saveQuota();
+    const gq=quote['Global Quote']||{};
+    const currentPrice=n(gq['05. price']);
+    const change=n(gq['09. change']);
+    const changePct=n((gq['10. change percent']||'0').replace('%',''));
+    const dayHigh=n(gq['03. high']);
+    const dayLow=n(gq['04. low']);
+    const dayVolume=n(gq['06. volume']);
+    const tradeDate=gq['07. latest trading day']||'';
+    const prevClose=n(gq['08. previous close']);
 
-    // ── Call 2: News ──
-    setStep('📰 Latest news (2/4)...');
+    if(!currentPrice) throw new Error(`Could not get live price for "${ticker}". Check symbol.`);
+
+    // ── CALL 2: Company Overview ──
+    setStep('📊 Company financials (2/6)...');
+    const ov=await avFetch('OVERVIEW',`symbol=${ticker}`);
+    callsToday++;saveQuota();
+    if(!ov['Name']) throw new Error(`"${ticker}" company data not found.`);
+
+    // ── CALL 3: News ──
+    setStep('📰 Latest news (3/6)...');
     let newsItems=[];
     try{
       const nd=await avFetch('NEWS_SENTIMENT',`tickers=${ticker}&limit=6&sort=LATEST`);
-      callsToday++; saveQuota();
+      callsToday++;saveQuota();
       newsItems=(nd?.feed||[]).filter(item=>{
-        // Only show news that mentions this ticker specifically
         const tickers=(item.ticker_sentiment||[]).map(t=>t.ticker);
         return tickers.includes(ticker)||item.title?.toUpperCase().includes(ticker);
       }).slice(0,5);
@@ -675,96 +494,103 @@ async function analyzeStock(){
     const sector=ov['Sector']||'Technology';
     const compTickers=(TICKER_COMPETITORS[ticker]||SECTOR_COMPETITORS[sector]||['AAPL','MSFT','GOOGL']).filter(t=>t!==ticker).slice(0,2);
 
-    // ── Call 3 & 4: Competitor overviews ──
+    // ── CALLS 4-7: Competitor overview + price ──
     let compData=[];
     for(let i=0;i<compTickers.length;i++){
-      if(callsToday>=24) break;
-      setStep(`📊 Competitor ${compTickers[i]} (${3+i}/4)...`);
+      if(callsToday>=23) break;
+      setStep(`📊 ${compTickers[i]} overview (${4+i*2}/6)...`);
       try{
         const cd=await avFetch('OVERVIEW',`symbol=${compTickers[i]}`);
-        callsToday++; saveQuota();
-        if(cd['Name']) compData.push({ticker:compTickers[i],data:cd});
+        callsToday++;saveQuota();
+        if(cd['Name']){
+          setStep(`💹 ${compTickers[i]} live price (${5+i*2}/6)...`);
+          let compPrice=0,compChange=0,compChangePct=0;
+          try{
+            const cq=await avFetch('GLOBAL_QUOTE',`symbol=${compTickers[i]}`);
+            callsToday++;saveQuota();
+            const cgq=cq['Global Quote']||{};
+            compPrice=n(cgq['05. price']);
+            compChange=n(cgq['09. change']);
+            compChangePct=n((cgq['10. change percent']||'0').replace('%',''));
+          }catch(e){}
+          compData.push({ticker:compTickers[i],data:cd,price:compPrice,change:compChange,changePct:compChangePct});
+        }
       }catch(e){}
     }
 
     setStep('🧮 Calculating...');
 
     // ── Parse data ──
-    const companyName = ov['Name']||ticker;
-    const sector2     = ov['Sector']||'';
-    const industry    = ov['Industry']||'';
-    const mktCap      = n(ov['MarketCapitalization']);
-    const eps         = n(ov['EPS']);
-    const peRatio     = n(ov['PERatio']);
-    const forwardPE   = n(ov['ForwardPE']);
-    const pegRatio    = n(ov['PEGRatio']);
-    const pbRatio     = n(ov['PriceToBookRatio']);
-    const pSales      = n(ov['PriceToSalesRatioTTM']);
-    const divYield    = n(ov['DividendYield'])*100;
-    const roe         = n(ov['ReturnOnEquityTTM'])*100;
-    const roa         = n(ov['ReturnOnAssetsTTM'])*100;
-    const netMargin   = n(ov['ProfitMargin'])*100;
-    const opMargin    = n(ov['OperatingMarginTTM'])*100;
-    const revGrowth   = n(ov['QuarterlyRevenueGrowthYOY'])*100;
-    const earningsG   = n(ov['QuarterlyEarningsGrowthYOY'])*100;
-    const analystTgt  = n(ov['AnalystTargetPrice']);
-    const beta        = n(ov['Beta']);
-    const week52High  = n(ov['52WeekHigh']);
-    const week52Low   = n(ov['52WeekLow']);
-    const bookValue   = n(ov['BookValue']);
-    const evEbitda    = n(ov['EVToEBITDA']);
-    const debtToEq    = n(ov['DebtToEquity'])/100;
-    const currentR    = n(ov['CurrentRatio']);
+    const companyName=ov['Name']||ticker;
+    const industry=ov['Industry']||'';
+    const mktCap=n(ov['MarketCapitalization']);
+    const eps=n(ov['EPS']);
+    const peRatio=n(ov['PERatio']);
+    const forwardPE=n(ov['ForwardPE']);
+    const pegRatio=n(ov['PEGRatio']);
+    const pbRatio=n(ov['PriceToBookRatio']);
+    const pSales=n(ov['PriceToSalesRatioTTM']);
+    const divYield=n(ov['DividendYield'])*100;
+    const roe=n(ov['ReturnOnEquityTTM'])*100;
+    const roa=n(ov['ReturnOnAssetsTTM'])*100;
+    const netMargin=n(ov['ProfitMargin'])*100;
+    const opMargin=n(ov['OperatingMarginTTM'])*100;
+    const revGrowth=n(ov['QuarterlyRevenueGrowthYOY'])*100;
+    const earningsG=n(ov['QuarterlyEarningsGrowthYOY'])*100;
+    const analystTgt=n(ov['AnalystTargetPrice']);
+    const beta=n(ov['Beta']);
+    const week52High=n(ov['52WeekHigh']);
+    const week52Low=n(ov['52WeekLow']);
+    const evEbitda=n(ov['EVToEBITDA']);
+    const debtToEq=n(ov['DebtToEquity'])/100;
+    const currentR=n(ov['CurrentRatio']);
 
-    // Estimate current price
-    const estPrice = analystTgt>0 ? analystTgt*0.95 : pbRatio>0&&bookValue>0 ? pbRatio*bookValue : 0;
-
-    // ── Default DCF ──
-    const g   = Math.min(Math.max(earningsG>0?earningsG/100:revGrowth>0?revGrowth/100:0.08,0.03),0.25);
-    const dr  = 0.10, tg=0.03, yrs=10;
+    // ── DCF using REAL current price ──
+    const g=Math.min(Math.max(earningsG>0?earningsG/100:revGrowth>0?revGrowth/100:0.08,0.03),0.25);
+    const dr=0.10,tg=0.03,yrs=10;
     let iv=0;
     if(eps>0){
       let cf=eps;
       for(let i=1;i<=yrs;i++){cf*=(1+g);iv+=cf/Math.pow(1+dr,i);}
       iv+=(cf*(1+tg)/(dr-tg))/Math.pow(1+dr,yrs);
     }
-    const mos=estPrice>0&&iv>0?((iv-estPrice)/iv)*100:null;
+    const mos=currentPrice>0&&iv>0?((iv-currentPrice)/iv)*100:null;
+    const upside=currentPrice>0&&analystTgt>0?((analystTgt-currentPrice)/currentPrice)*100:0;
 
-    // ── Scores ──
     const dcfScore=mos===null?0:mos>=30?25:mos>=10?18:mos>=0?10:0;
     const dcfItems=[
-      {ok:iv>0,             text:`Intrinsic Value: $${iv.toFixed(2)}/share`},
+      {ok:iv>0,text:`Intrinsic Value: $${iv.toFixed(2)}/share`},
       {ok:mos!==null&&mos>=30,text:mos!==null?`Margin of Safety: ${mos.toFixed(1)}% (target ≥30%)`:'Margin of Safety: N/A'},
-      {ok:g>=0.08&&g<=0.20, text:`Growth Rate: ${(g*100).toFixed(1)}% (ideal 8–20%)`},
-      {ok:analystTgt>0,     text:analystTgt>0?`Analyst Target: $${analystTgt.toFixed(2)}`:'Analyst Target: N/A'},
+      {ok:g>=0.08&&g<=0.20,text:`Growth Rate: ${(g*100).toFixed(1)}% (ideal 8–20%)`},
+      {ok:analystTgt>0&&upside>0,text:analystTgt>0?`Analyst Upside: ${upside.toFixed(1)}% ($${analystTgt.toFixed(2)} target)`:'Analyst Target: N/A'},
     ];
     const epsOk=eps>0,peOk=peRatio>0&&peRatio<25,pegOk=pegRatio>0&&pegRatio<1,pbOk=pbRatio>0&&pbRatio<3;
     const epsScore=(epsOk?4:0)+(peOk?3:0)+(pegOk?4:0)+(pbOk?2:0);
     const epsItems=[
       {ok:epsOk,text:`EPS (TTM): $${eps.toFixed(2)}`},
-      {ok:peOk, text:`P/E: ${peRatio>0?peRatio.toFixed(1):'N/A'} (target <25)`},
-      {ok:pegOk,text:`PEG: ${pegRatio>0?pegRatio.toFixed(2):'N/A'} (under 1.0 = undervalued)`},
-      {ok:pbOk, text:`P/B: ${pbRatio>0?pbRatio.toFixed(2):'N/A'} (under 3.0)`},
+      {ok:peOk,text:`P/E: ${peRatio>0?peRatio.toFixed(1):'N/A'} (target <25)`},
+      {ok:pegOk,text:`PEG: ${pegRatio>0?pegRatio.toFixed(2):'N/A'} (under 1.0)`},
+      {ok:pbOk,text:`P/B: ${pbRatio>0?pbRatio.toFixed(2):'N/A'} (under 3.0)`},
     ];
     const moatItems=[
-      {ok:roe>=15,      text:`ROE: ${roe.toFixed(1)}% (target ≥15%)`},
-      {ok:netMargin>=10,text:`Net Margin: ${netMargin.toFixed(1)}% (target ≥10%)`},
-      {ok:opMargin>=15, text:`Op Margin: ${opMargin.toFixed(1)}% (target ≥15%)`},
-      {ok:revGrowth>=5, text:`Revenue Growth: ${revGrowth.toFixed(1)}% YoY (target ≥5%)`},
+      {ok:roe>=15,text:`ROE: ${roe.toFixed(1)}% (≥15%)`},
+      {ok:netMargin>=10,text:`Net Margin: ${netMargin.toFixed(1)}% (≥10%)`},
+      {ok:opMargin>=15,text:`Op Margin: ${opMargin.toFixed(1)}% (≥15%)`},
+      {ok:revGrowth>=5,text:`Rev Growth: ${revGrowth.toFixed(1)}% YoY (≥5%)`},
     ];
     const moatScore=moatItems.filter(i=>i.ok).length*6;
     const debtItems=[
-      {ok:debtToEq>0&&debtToEq<0.5, text:debtToEq>0?`Debt/Equity: ${debtToEq.toFixed(2)} (target <0.5)`:'Debt/Equity: N/A'},
-      {ok:currentR>=1.5,            text:currentR>0?`Current Ratio: ${currentR.toFixed(2)} (target ≥1.5)`:'Current Ratio: N/A'},
-      {ok:roa>=5,                   text:`ROA: ${roa.toFixed(1)}% (target ≥5%)`},
-      {ok:evEbitda>0&&evEbitda<15,  text:evEbitda>0?`EV/EBITDA: ${evEbitda.toFixed(1)} (under 15)`:'EV/EBITDA: N/A'},
+      {ok:debtToEq>0&&debtToEq<0.5,text:debtToEq>0?`Debt/Equity: ${debtToEq.toFixed(2)} (<0.5)`:'Debt/Equity: N/A'},
+      {ok:currentR>=1.5,text:currentR>0?`Current Ratio: ${currentR.toFixed(2)} (≥1.5)`:'Current Ratio: N/A'},
+      {ok:roa>=5,text:`ROA: ${roa.toFixed(1)}% (≥5%)`},
+      {ok:evEbitda>0&&evEbitda<15,text:evEbitda>0?`EV/EBITDA: ${evEbitda.toFixed(1)} (<15)`:'EV/EBITDA: N/A'},
     ];
     const debtScore=debtItems.filter(i=>i.ok).length*6;
     const oeItems=[
-      {ok:netMargin>0,        text:`Net Margin: ${netMargin.toFixed(1)}%`},
-      {ok:roe>=15,            text:`ROE ${roe.toFixed(1)}% = strong owner earnings`},
-      {ok:pSales>0&&pSales<3, text:pSales>0?`P/Sales: ${pSales.toFixed(2)} (under 3.0)`:'P/Sales: N/A'},
-      {ok:divYield>0,         text:divYield>0?`Dividend: ${divYield.toFixed(2)}% yield`:'No dividend'},
+      {ok:netMargin>0,text:`Net Margin: ${netMargin.toFixed(1)}%`},
+      {ok:roe>=15,text:`ROE ${roe.toFixed(1)}% = strong earnings`},
+      {ok:pSales>0&&pSales<3,text:pSales>0?`P/Sales: ${pSales.toFixed(2)} (<3.0)`:'P/Sales: N/A'},
+      {ok:divYield>0,text:divYield>0?`Dividend: ${divYield.toFixed(2)}%`:'No dividend'},
     ];
     const oeScore=oeItems.filter(i=>i.ok).length*6;
     const total=dcfScore+epsScore+moatScore+debtScore+oeScore;
@@ -773,52 +599,52 @@ async function analyzeStock(){
       ?{label:'Strong Buy',color:'#16a34a',bg:'#f0fdf4',border:'#bbf7d0',emoji:'🟢'}
       :total>=45
       ?{label:'Watch List',color:'#d97706',bg:'#fffbeb',border:'#fde68a',emoji:'🟡'}
-      :{label:'Avoid',     color:'#dc2626',bg:'#fef2f2',border:'#fecaca',emoji:'🔴'};
+      :{label:'Avoid',color:'#dc2626',bg:'#fef2f2',border:'#fecaca',emoji:'🔴'};
 
-    // ── News HTML ──
+    // News HTML
     const newsHtml=newsItems.length>0?newsItems.map(item=>{
       const sl=item.overall_sentiment_label||'Neutral';
-      const sc=sl.toLowerCase().includes('bull')||sl.toLowerCase().includes('positive')?'sent-positive'
-        :sl.toLowerCase().includes('bear')||sl.toLowerCase().includes('negative')?'sent-negative':'sent-neutral';
+      const sc=sl.toLowerCase().includes('bull')||sl.toLowerCase().includes('positive')?'sent-positive':sl.toLowerCase().includes('bear')||sl.toLowerCase().includes('negative')?'sent-negative':'sent-neutral';
       const tp=item.time_published||'';
       const dt=tp.length>=8?`${tp.substring(0,4)}-${tp.substring(4,6)}-${tp.substring(6,8)}`:'';
       const tickerSent=(item.ticker_sentiment||[]).find(t=>t.ticker===ticker);
-      const tickerScore=tickerSent?parseFloat(tickerSent.ticker_sentiment_score||0):null;
-      const tickerLabel=tickerScore!==null?(tickerScore>0.15?'📈 Bullish for '+ticker:tickerScore<-0.15?'📉 Bearish for '+ticker:'➡️ Neutral for '+ticker):'';
+      const ts=tickerSent?parseFloat(tickerSent.ticker_sentiment_score||0):null;
+      const tl=ts!==null?(ts>0.15?'📈 Bullish':ts<-0.15?'📉 Bearish':'➡️ Neutral'):'';
       return `<div class="news-item">
         <div class="news-headline">${item.title||'No title'}</div>
         <div class="news-meta">
           <span class="news-sentiment ${sc}">${sl}</span>
-          ${tickerLabel?`<span style="font-size:10px;font-weight:600;color:#374151">${tickerLabel}</span>`:''}
-          <span>${item.source||''}</span>
-          <span>${dt}</span>
+          ${tl?`<span style="font-size:10px;font-weight:600;color:#374151">${tl} for ${ticker}</span>`:''}
+          <span>${item.source||''}</span><span>${dt}</span>
         </div>
       </div>`;
-    }).join(''):'<div style="font-size:13px;color:#9ca3af;padding:12px 0;text-align:center">No recent news available</div>';
+    }).join(''):'<div style="font-size:13px;color:#9ca3af;padding:12px 0;text-align:center">No recent news</div>';
 
-    // ── Competitor Table ──
-    const allStocks=[{ticker,data:ov},...compData];
+    // Competitor Table with REAL prices
+    const allStocks=[{ticker,data:ov,price:currentPrice,change,changePct},...compData];
     const metrics=[
-      {key:'PERatio',          label:'P/E',        fmt:v=>n(v)>0?n(v).toFixed(1):'N/A',better:'lower'},
-      {key:'ForwardPE',        label:'Fwd P/E',    fmt:v=>n(v)>0?n(v).toFixed(1):'N/A',better:'lower'},
-      {key:'PEGRatio',         label:'PEG',        fmt:v=>n(v)>0?n(v).toFixed(2):'N/A',better:'lower'},
-      {key:'PriceToBookRatio', label:'P/B',        fmt:v=>n(v)>0?n(v).toFixed(2):'N/A',better:'lower'},
-      {key:'ProfitMargin',     label:'Net Margin', fmt:v=>(n(v)*100).toFixed(1)+'%',    better:'higher'},
-      {key:'OperatingMarginTTM',label:'Op Margin', fmt:v=>(n(v)*100).toFixed(1)+'%',    better:'higher'},
-      {key:'ReturnOnEquityTTM',label:'ROE',        fmt:v=>(n(v)*100).toFixed(1)+'%',    better:'higher'},
-      {key:'ReturnOnAssetsTTM',label:'ROA',        fmt:v=>(n(v)*100).toFixed(1)+'%',    better:'higher'},
-      {key:'EPS',              label:'EPS',        fmt:v=>'$'+n(v).toFixed(2),          better:'higher'},
-      {key:'QuarterlyRevenueGrowthYOY',label:'Rev Growth',fmt:v=>(n(v)*100).toFixed(1)+'%',better:'higher'},
-      {key:'DividendYield',    label:'Dividend',   fmt:v=>(n(v)*100).toFixed(2)+'%',    better:'higher'},
-      {key:'DebtToEquity',     label:'Debt/Eq',    fmt:v=>n(v)>0?(n(v)/100).toFixed(2):'N/A',better:'lower'},
-      {key:'Beta',             label:'Beta',       fmt:v=>n(v)>0?n(v).toFixed(2):'N/A',better:'lower'},
+      {key:'price',label:'Price',fmt:(s)=>s.price>0?'$'+s.price.toFixed(2):'N/A',better:'none'},
+      {key:'changePct',label:'Today',fmt:(s)=>s.price>0?(s.changePct>=0?'+':'')+s.changePct.toFixed(2)+'%':'N/A',better:'higher',color:(s)=>s.changePct>=0?'#16a34a':'#dc2626'},
+      {key:'PERatio',label:'P/E',fmt:(s)=>n(s.data['PERatio'])>0?n(s.data['PERatio']).toFixed(1):'N/A',better:'lower'},
+      {key:'PEGRatio',label:'PEG',fmt:(s)=>n(s.data['PEGRatio'])>0?n(s.data['PEGRatio']).toFixed(2):'N/A',better:'lower'},
+      {key:'PriceToBookRatio',label:'P/B',fmt:(s)=>n(s.data['PriceToBookRatio'])>0?n(s.data['PriceToBookRatio']).toFixed(2):'N/A',better:'lower'},
+      {key:'ProfitMargin',label:'Net Margin',fmt:(s)=>(n(s.data['ProfitMargin'])*100).toFixed(1)+'%',better:'higher'},
+      {key:'ReturnOnEquityTTM',label:'ROE',fmt:(s)=>(n(s.data['ReturnOnEquityTTM'])*100).toFixed(1)+'%',better:'higher'},
+      {key:'EPS',label:'EPS',fmt:(s)=>'$'+n(s.data['EPS']).toFixed(2),better:'higher'},
+      {key:'DividendYield',label:'Dividend',fmt:(s)=>(n(s.data['DividendYield'])*100).toFixed(2)+'%',better:'higher'},
+      {key:'DebtToEquity',label:'Debt/Eq',fmt:(s)=>n(s.data['DebtToEquity'])>0?(n(s.data['DebtToEquity'])/100).toFixed(2):'N/A',better:'lower'},
+      {key:'Beta',label:'Beta',fmt:(s)=>n(s.data['Beta'])>0?n(s.data['Beta']).toFixed(2):'N/A',better:'lower'},
     ];
 
-    function getBestIdx(key,better){
-      const vals=allStocks.map(s=>n(s.data[key]));
-      const valid=vals.filter(v=>v>0);
+    function getBestIdx(m){
+      if(m.better==='none') return -1;
+      const vals=allStocks.map(s=>{
+        if(m.key==='changePct'||m.key==='price') return s[m.key]||0;
+        return n(s.data[m.key]);
+      });
+      const valid=vals.filter(v=>v>0||(m.key==='changePct'));
       if(!valid.length) return -1;
-      const best=better==='lower'?Math.min(...valid):Math.max(...valid);
+      const best=m.better==='lower'?Math.min(...valid):Math.max(...valid);
       return vals.findIndex(v=>v===best);
     }
 
@@ -826,27 +652,25 @@ async function analyzeStock(){
       <table class="comp-table">
         <thead><tr>
           <th>Metric</th>
-          ${allStocks.map((s,i)=>`<th style="${i===0?'color:#d97706':''}">
-            ${s.ticker}${i===0?'<span class="comp-badge">★</span>':''}
-          </th>`).join('')}
+          ${allStocks.map((s,i)=>`<th style="${i===0?'color:#d97706':''}">${s.ticker}${i===0?'<span class="comp-badge">★</span>':''}</th>`).join('')}
         </tr></thead>
         <tbody>
           ${metrics.map(m=>{
-            const bi=getBestIdx(m.key,m.better);
-            return `<tr>${['',].concat([]).join('')}
+            const bi=getBestIdx(m);
+            return `<tr>
               <td>${m.label}</td>
               ${allStocks.map((s,i)=>{
-                const val=m.fmt(s.data[m.key]);
-                return `<td class="${i===0?'comp-highlight':''} ${i===bi&&val!=='N/A'?'comp-best':''}">${val}${i===bi&&val!=='N/A'?' 🏆':''}</td>`;
+                const val=m.fmt(s);
+                const color=m.color?m.color(s):null;
+                return `<td class="${i===0?'comp-highlight':''} ${i===bi&&val!=='N/A'?'comp-best':''}" ${color?`style="color:${color};font-weight:700"`:''}>${val}${i===bi&&val!=='N/A'&&m.better!=='none'?' 🏆':''}</td>`;
               }).join('')}
             </tr>`;
           }).join('')}
         </tbody>
       </table></div>
-      <div style="font-size:10px;color:#9ca3af;margin-top:6px">🏆 best among compared · ★ = your stock</div>`;
+      <div style="font-size:10px;color:#9ca3af;margin-top:6px">🏆 best among compared · ★ = your stock · Prices live from ${tradeDate}</div>`;
 
-    // ── Commentary ──
-    const commentaryHtml=generateCommentary(ticker,ov,compData);
+    const commentaryHtml=generateCommentary(ticker,ov,compData,currentPrice,analystTgt);
 
     const fmtCap=c=>c>=1e12?'$'+(c/1e12).toFixed(2)+'T':c>=1e9?'$'+(c/1e9).toFixed(1)+'B':'$'+(c/1e6).toFixed(0)+'M';
     const pColor=p=>p>=70?'#22c55e':p>=40?'#f59e0b':'#f87171';
@@ -871,42 +695,69 @@ async function analyzeStock(){
     }
 
     const safeName=companyName.replace(/'/g,"\\'").replace(/"/g,'\\"');
-
-    setStatus(`✅ ${companyName} — complete`,'#86efac');
+    setStatus(`✅ ${companyName} — live price $${currentPrice.toFixed(2)}`,'#86efac');
 
     results.innerHTML=`
-      <!-- Company Header with Current Price -->
+      <!-- Company + LIVE PRICE -->
       <div class="company-header" style="margin-top:16px">
         <div class="price-row">
           <div>
-            <div style="font-size:20px;font-weight:800;color:#1f2937">${ticker}</div>
+            <div style="font-size:20px;font-weight:800;color:#1f2937">${ticker}<span class="live-badge">🟢 LIVE</span></div>
             <div style="font-size:13px;color:#374151;font-weight:600;margin-top:2px">${companyName}</div>
-            <div style="font-size:11px;color:#9ca3af;margin-top:2px">${sector2}${industry?' · '+industry:''}</div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:2px">${sector}${industry?' · '+industry:''}</div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:11px;color:#9ca3af">52W Range</div>
-            <div style="font-size:12px;font-weight:700;color:#1f2937">$${week52Low.toFixed(0)} – $${week52High.toFixed(0)}</div>
-            ${beta>0?`<div style="font-size:11px;color:#9ca3af;margin-top:2px">Beta: ${beta.toFixed(2)}</div>`:''}
+            <div id="livePrice" style="font-size:24px;font-weight:900;color:#1f2937">$${currentPrice.toFixed(2)}</div>
+            <div id="priceChange" class="${change>=0?'up':'down'}" style="font-size:13px;font-weight:700">
+              ${change>=0?'▲':'▼'} $${Math.abs(change).toFixed(2)} (${Math.abs(changePct).toFixed(2)}%)
+            </div>
+            <div id="priceDate" style="font-size:10px;color:#9ca3af;margin-top:2px">Updated: ${tradeDate}</div>
           </div>
         </div>
-        <!-- Price vs Target -->
-        <div style="display:flex;gap:10px;margin-top:14px">
-          <div style="flex:1;background:#f8fafc;border-radius:12px;padding:12px;text-align:center">
-            <div style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;margin-bottom:4px">Est. Current Price</div>
-            <div style="font-size:20px;font-weight:900;color:#1f2937">$${estPrice>0?estPrice.toFixed(2):'N/A'}</div>
-            <div style="font-size:10px;color:#6b7280;margin-top:2px">Based on P/B × Book Value</div>
+
+        <!-- Trading Session Info -->
+        <div style="display:flex;gap:8px;margin-top:12px;padding:10px;background:#f8fafc;border-radius:10px;font-size:11px">
+          <div style="flex:1;text-align:center">
+            <div style="color:#9ca3af;font-weight:600">Open</div>
+            <div style="color:#374151;font-weight:700;margin-top:2px">$${prevClose.toFixed(2)}</div>
           </div>
-          <div style="flex:1;background:#f0fdf4;border-radius:12px;padding:12px;text-align:center;border:1px solid #bbf7d0">
+          <div style="flex:1;text-align:center">
+            <div style="color:#9ca3af;font-weight:600">Day High</div>
+            <div style="color:#16a34a;font-weight:700;margin-top:2px">$${dayHigh.toFixed(2)}</div>
+          </div>
+          <div style="flex:1;text-align:center">
+            <div style="color:#9ca3af;font-weight:600">Day Low</div>
+            <div style="color:#dc2626;font-weight:700;margin-top:2px">$${dayLow.toFixed(2)}</div>
+          </div>
+          <div style="flex:1;text-align:center">
+            <div style="color:#9ca3af;font-weight:600">Volume</div>
+            <div style="color:#374151;font-weight:700;margin-top:2px">${dayVolume>1e6?(dayVolume/1e6).toFixed(1)+'M':dayVolume.toLocaleString()}</div>
+          </div>
+        </div>
+
+        <!-- Current Price vs Target -->
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <div style="flex:1;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;text-align:center">
+            <div style="font-size:10px;font-weight:700;color:#1d4ed8;text-transform:uppercase;margin-bottom:4px">💹 Current Price</div>
+            <div style="font-size:20px;font-weight:900;color:#1d4ed8">$${currentPrice.toFixed(2)}</div>
+            <div style="font-size:10px;color:#6b7280;margin-top:2px">Live market price</div>
+          </div>
+          <div style="flex:1;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;text-align:center">
             <div style="font-size:10px;font-weight:700;color:#16a34a;text-transform:uppercase;margin-bottom:4px">🎯 Analyst Target</div>
             <div style="font-size:20px;font-weight:900;color:#16a34a">$${analystTgt>0?analystTgt.toFixed(2):'N/A'}</div>
-            <div style="font-size:10px;color:#6b7280;margin-top:2px">${analystTgt>0&&estPrice>0?`${((analystTgt-estPrice)/estPrice*100).toFixed(1)}% upside`:'Wall St. consensus'}</div>
+            <div style="font-size:10px;color:${upside>=0?'#16a34a':'#dc2626'};font-weight:700;margin-top:2px">${analystTgt>0?(upside>=0?'+':'')+upside.toFixed(1)+'% upside':'—'}</div>
           </div>
         </div>
+
         ${iv>0?`<div style="background:#fffbeb;border-radius:12px;padding:10px;margin-top:8px;text-align:center;border:1px solid #fde68a">
           <span style="font-size:11px;color:#92400e;font-weight:700">📐 DCF Intrinsic Value: </span>
           <span style="font-size:16px;font-weight:900;color:#92400e">$${iv.toFixed(2)}</span>
           ${mos!==null?`<span style="font-size:12px;font-weight:700;color:${mos>=30?'#16a34a':mos>=0?'#d97706':'#dc2626'};margin-left:8px">${mos.toFixed(1)}% margin of safety</span>`:''}
         </div>`:''}
+
+        <button class="btn-refresh" style="margin-top:12px;margin-bottom:0" onclick="refreshPrice('${ticker}')">
+          🔄 Refresh Live Price (uses 1 API call)
+        </button>
       </div>
 
       <!-- Verdict -->
@@ -921,14 +772,13 @@ async function analyzeStock(){
         ${divYield>0?`<div style="margin-top:8px;font-size:12px;color:#6b7280">Dividend: <strong style="color:#16a34a">${divYield.toFixed(2)}%</strong></div>`:''}
       </div>
 
-      <!-- Key Metrics -->
       <div class="metrics-grid">
         <div class="metric-box"><div class="mlabel">EPS (TTM)</div><div class="mvalue" style="color:${eps>0?'#16a34a':'#dc2626'}">$${eps.toFixed(2)}</div><div class="msub">Earnings/share</div></div>
         <div class="metric-box"><div class="mlabel">PEG Ratio</div><div class="mvalue" style="color:${pegOk?'#16a34a':pegRatio>2?'#dc2626':'#d97706'}">${pegRatio>0?pegRatio.toFixed(2):'N/A'}</div><div class="msub">Under 1.0 = undervalued</div></div>
         <div class="metric-box"><div class="mlabel">P/E Ratio</div><div class="mvalue" style="color:${peOk?'#16a34a':'#d97706'}">${peRatio>0?peRatio.toFixed(1):'N/A'}</div><div class="msub">Target: under 25</div></div>
         <div class="metric-box"><div class="mlabel">ROE</div><div class="mvalue" style="color:${roe>=15?'#16a34a':'#dc2626'}">${roe.toFixed(1)}%</div><div class="msub">Target: ≥15%</div></div>
         <div class="metric-box"><div class="mlabel">Net Margin</div><div class="mvalue" style="color:${netMargin>=10?'#16a34a':'#dc2626'}">${netMargin.toFixed(1)}%</div><div class="msub">Target: ≥10%</div></div>
-        <div class="metric-box"><div class="mlabel">Market Cap</div><div class="mvalue" style="font-size:14px">${fmtCap(mktCap)}</div><div class="msub">${sector2||'—'}</div></div>
+        <div class="metric-box"><div class="mlabel">Market Cap</div><div class="mvalue" style="font-size:14px">${fmtCap(mktCap)}</div><div class="msub">${sector||'—'}</div></div>
       </div>
 
       ${secHtml('📊 Intrinsic Value (DCF)',dcfScore,26,dcfItems,'dcf')}
@@ -937,96 +787,48 @@ async function analyzeStock(){
       ${secHtml('💰 Debt & Financial Health',debtScore,24,debtItems,'debt')}
       ${secHtml('🔑 Owner Earnings',oeScore,24,oeItems,'oe')}
 
-      <!-- Editable DCF Calculator -->
       <div class="result-section">
         <h3 onclick="toggleSection('dcfcalc')">
           <span>🧮 DCF Calculator (Editable)</span>
           <span class="chevron open" id="ch-dcfcalc">▼</span>
         </h3>
         <div class="collapse-content open" id="cc-dcfcalc">
-          <div style="font-size:12px;color:#6b7280;margin-bottom:10px">Adjust any parameter and tap Recalculate to see how intrinsic value changes.</div>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:10px">Adjust parameters and tap Recalculate. Current price auto-filled from live market.</div>
           <div class="dcf-input-grid">
-            <div class="dcf-input-box">
-              <label>EPS ($)</label>
-              <input type="number" id="dcf_eps" value="${eps.toFixed(2)}" step="0.01"/>
-            </div>
-            <div class="dcf-input-box">
-              <label>Growth Rate (%)</label>
-              <input type="number" id="dcf_growth" value="${(g*100).toFixed(1)}" step="0.5"/>
-            </div>
-            <div class="dcf-input-box">
-              <label>Discount Rate (%)</label>
-              <input type="number" id="dcf_disc" value="10" step="0.5"/>
-            </div>
-            <div class="dcf-input-box">
-              <label>Terminal Growth (%)</label>
-              <input type="number" id="dcf_term" value="3" step="0.5"/>
-            </div>
-            <div class="dcf-input-box">
-              <label>Years</label>
-              <input type="number" id="dcf_yrs" value="10" min="5" max="20"/>
-            </div>
-            <div class="dcf-input-box">
-              <label>Current Price ($)</label>
-              <input type="number" id="dcf_price" value="${estPrice>0?estPrice.toFixed(2):''}" step="0.01"/>
-            </div>
+            <div class="dcf-input-box"><label>EPS ($)</label><input type="number" id="dcf_eps" value="${eps.toFixed(2)}" step="0.01"/></div>
+            <div class="dcf-input-box"><label>Growth Rate (%)</label><input type="number" id="dcf_growth" value="${(g*100).toFixed(1)}" step="0.5"/></div>
+            <div class="dcf-input-box"><label>Discount Rate (%)</label><input type="number" id="dcf_disc" value="10" step="0.5"/></div>
+            <div class="dcf-input-box"><label>Terminal Growth (%)</label><input type="number" id="dcf_term" value="3" step="0.5"/></div>
+            <div class="dcf-input-box"><label>Years</label><input type="number" id="dcf_yrs" value="10" min="5" max="20"/></div>
+            <div class="dcf-input-box"><label>Current Price ($) 🟢 LIVE</label><input type="number" id="dcf_price" value="${currentPrice.toFixed(2)}" step="0.01"/></div>
           </div>
           <button class="dcf-calc-btn" onclick="recalcDCF()">🔄 Recalculate Intrinsic Value</button>
           <div id="dcf-result-area"></div>
         </div>
       </div>
 
-      <!-- DCF Backtest -->
-      <div class="result-section">
-        <h3 onclick="toggleSection('backtest')">
-          <span>📊 DCF Backtest — Historical Accuracy</span>
-          <span class="chevron" id="ch-backtest">▼</span>
-        </h3>
-        <div class="collapse-content" id="cc-backtest">
-          <div id="bt-content">
-            <div style="text-align:center;padding:12px">
-              <div style="font-size:12px;color:#6b7280;margin-bottom:10px;line-height:1.6">
-                Compare DCF predictions from past time points (3M, 6M, 1Y, 2Y, 3Y, 5Y ago) with today's actual stock price.<br/>
-                Analyze prediction errors and get calibrated parameters for more accurate future estimates.
-              </div>
-              <button class="dcf-calc-btn" onclick="loadBacktest('${ticker}',${estPrice>0?estPrice.toFixed(2):0})">📊 Load Backtest Analysis (2 API calls)</button>
-              <div style="font-size:10px;color:#9ca3af;margin-top:4px">Uses EARNINGS + TIME_SERIES_MONTHLY endpoints</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Competitor Comparison -->
       <div class="result-section">
         <h3 onclick="toggleSection('comp')">
-          <span>📊 vs ${compData.map(c=>c.ticker).join(', ')}</span>
+          <span>📊 vs ${compData.map(c=>c.ticker).join(', ')} <span class="live-badge">🟢 LIVE</span></span>
           <span class="chevron open" id="ch-comp">▼</span>
         </h3>
-        <div class="collapse-content open" id="cc-comp">
-          ${compTableHtml}
-        </div>
+        <div class="collapse-content open" id="cc-comp">${compTableHtml}</div>
       </div>
 
-      <!-- News -->
       <div class="result-section">
         <h3 onclick="toggleSection('news')">
           <span>📰 Latest News — ${ticker}</span>
           <span class="chevron open" id="ch-news">▼</span>
         </h3>
-        <div class="collapse-content open" id="cc-news">
-          ${newsHtml}
-        </div>
+        <div class="collapse-content open" id="cc-news">${newsHtml}</div>
       </div>
 
-      <!-- AI Commentary -->
       <div class="result-section">
         <h3 onclick="toggleSection('commentary')">
           <span>🤖 AI Analysis & Commentary</span>
           <span class="chevron open" id="ch-commentary">▼</span>
         </h3>
-        <div class="collapse-content open" id="cc-commentary">
-          ${commentaryHtml}
-        </div>
+        <div class="collapse-content open" id="cc-commentary">${commentaryHtml}</div>
       </div>
 
       <div class="quote-box">
@@ -1038,10 +840,8 @@ async function analyzeStock(){
         💾 Save to Watchlist
       </button>
       <button class="btn-reset" onclick="resetApp()">🔄 Analyze Another Stock</button>
-      <p class="disclaimer">⚠️ Educational use only. Not financial advice. Data: Alpha Vantage. Always do your own research before investing.</p>
+      <p class="disclaimer">⚠️ Educational use only. Not financial advice. Live prices via Alpha Vantage Global Quote.</p>
     `;
-
-    // Run default DCF calc
     recalcDCF();
 
   }catch(err){
@@ -1058,11 +858,7 @@ async function analyzeStock(){
 function renderWatchlist(){
   const el=document.getElementById('watchlistView');
   if(!watchlist.length){
-    el.innerHTML=`<div class="welcome">
-      <div style="font-size:48px;margin-bottom:12px">📋</div>
-      <div style="font-size:16px;font-weight:700;color:#374151;margin-bottom:6px">Watchlist Empty</div>
-      <div style="font-size:13px;color:#6b7280">Analyze a stock and tap "Save to Watchlist"</div>
-    </div>`;
+    el.innerHTML=`<div class="welcome"><div style="font-size:48px;margin-bottom:12px">📋</div><div style="font-size:16px;font-weight:700;color:#374151">Watchlist Empty</div></div>`;
     return;
   }
   el.innerHTML=`<div class="watchlist-card">
@@ -1078,14 +874,12 @@ function renderWatchlist(){
       </div>
       <button onclick="removeFromWatchlist(${i})" style="background:none;border:none;color:#f87171;font-size:18px;cursor:pointer;padding:4px">✕</button>
     </div>`).join('')}
-  </div>
-  <p class="disclaimer">Tap any stock to re-analyze it</p>`;
+  </div>`;
 }
 
 function loadFromWatchlist(ticker){
   document.getElementById('tickerInput').value=ticker;
-  showPage('analyze');
-  analyzeStock();
+  showPage('analyze');analyzeStock();
 }
 
 function removeFromWatchlist(i){
@@ -1115,4 +909,3 @@ function resetApp(){
 </script>
 </body>
 </html>
-
