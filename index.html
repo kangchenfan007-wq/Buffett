@@ -222,8 +222,8 @@ function loadKeys() {
 
   const today = new Date().toDateString();
   try {
-    // Bumped v3→v4 to discard stale bogus-block flags from the old detector
-    const saved = JSON.parse(localStorage.getItem('av_quota4') || '{"date":"","calls":[0,0],"blocked":[false,false]}');
+    // Bumped v4→v5 to wipe bogus-block flags from the "per-minute misread as daily" bug
+    const saved = JSON.parse(localStorage.getItem('av_quota5') || '{"date":"","calls":[0,0],"blocked":[false,false]}');
     if (saved.date === today) {
       callsPerKey = saved.calls || [0, 0];
       blockedKeys = saved.blocked || [false, false];
@@ -242,7 +242,7 @@ function loadKeys() {
 }
 
 function saveQuota() {
-  localStorage.setItem('av_quota4', JSON.stringify({
+  localStorage.setItem('av_quota5', JSON.stringify({
     date: new Date().toDateString(),
     calls: callsPerKey,
     blocked: blockedKeys
@@ -315,6 +315,16 @@ function markCurrentKeyBlocked() {
 
 function hasAvailableKey() {
   return getCurrentKey() !== null;
+}
+
+// Return another usable key distinct from the one just throttled, or null.
+function pickFreshMinuteKey(currentKey) {
+  for (let i = 0; i < AV_KEYS.length; i++) {
+    if (AV_KEYS[i] !== currentKey && !blockedKeys[i] && callsPerKey[i] < 25) {
+      return AV_KEYS[i];
+    }
+  }
+  return null;
 }
 
 function totalCallsRemaining() {
@@ -390,7 +400,8 @@ function toggleSection(id) {
 }
 
 // ── SMART avFetch: detects server-side blocks and auto-switches keys ──
-async function avFetch(fn, params) {
+// _retryAttempt tracks internal retries after per-minute throttle — not for callers.
+async function avFetch(fn, params, _retryAttempt = 0) {
   const key = getCurrentKey();
   if (!key) {
     const err = new Error('All API keys exhausted/blocked by Alpha Vantage server. Come back tomorrow or add another key.');
@@ -407,23 +418,26 @@ async function avFetch(fn, params) {
   const infoStr = (data['Information'] || '').toLowerCase();
   const combined = noteStr + ' ' + infoStr;
 
-  // Three distinct signals — only DAILY limits mark the key blocked for the day.
-  // Per-minute throttling is transient; premium-endpoint is endpoint-specific.
-  const isDailyLimit =
-    combined.includes('25 requests per day') ||
-    combined.includes('requests per day') ||
-    combined.includes('daily rate limit') ||
-    (combined.includes('exceeded') && combined.includes('day'));
-
+  // CRITICAL ORDERING: check per-minute FIRST. Both AV messages mention
+  // "25 requests per day" — the per-minute throttle message quotes it as
+  // part of the plan description ("5 calls per minute and 25 per day"),
+  // but the trigger is actually a transient per-minute overflow, NOT a
+  // daily exhaustion. Only the standalone daily-limit message should
+  // lock the key for the day.
   const isPerMinuteThrottle =
-    !isDailyLimit && (
-      combined.includes('calls per minute') ||
-      combined.includes('call frequency') ||
-      combined.includes('5 requests per minute')
+    combined.includes('calls per minute') ||
+    combined.includes('call frequency') ||
+    combined.includes('5 requests per minute');
+
+  const isDailyLimit =
+    !isPerMinuteThrottle && (
+      combined.includes('rate limit is 25 requests per day') ||
+      combined.includes('daily rate limit') ||
+      (combined.includes('exceeded') && combined.includes('day'))
     );
 
   const isPremiumEndpoint =
-    !isDailyLimit && !isPerMinuteThrottle && (
+    !isPerMinuteThrottle && !isDailyLimit && (
       combined.includes('premium endpoint') ||
       (combined.includes('premium') && combined.includes('subscribe'))
     );
@@ -441,7 +455,20 @@ async function avFetch(fn, params) {
   }
 
   if (isPerMinuteThrottle) {
-    const err = new Error('Per-minute rate limit hit (5 calls/min on free tier). Wait ~60s and retry — your key is NOT blocked.');
+    // Try switching to the other key first — its minute-bucket may be fresh
+    const altKey = pickFreshMinuteKey(key);
+    if (altKey) {
+      activeKeyIdx = AV_KEYS.indexOf(altKey);
+      return avFetch(fn, params, _retryAttempt);
+    }
+    // No alternate key — back off and retry once automatically (up to 2 times)
+    if (_retryAttempt < 2) {
+      const waitMs = 15000; // 15s backoff; AV's per-minute bucket usually clears quickly
+      setStatus(`⏸ Per-minute limit — auto-retrying in ${waitMs/1000}s...`, '#fde68a');
+      await new Promise(r => setTimeout(r, waitMs));
+      return avFetch(fn, params, _retryAttempt + 1);
+    }
+    const err = new Error('Per-minute rate limit hit (5 calls/min on free tier). Wait 60s and retry — your key is NOT blocked.');
     err.isPerMinute = true;
     throw err;
   }
