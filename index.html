@@ -213,6 +213,7 @@ let AV_KEYS = [];
 let activeKeyIdx = 0;
 let callsPerKey = [0, 0];
 let blockedKeys = [false, false]; // track server-side blocks
+let lastEmptyReason = ''; // diagnostic: why the last call returned empty data
 let watchlist = [];
 
 function loadKeys() {
@@ -496,19 +497,21 @@ async function avFetch(fn, params, _retryAttempt = 0) {
 
   if (isPremiumEndpoint) {
     // Don't throw — return an empty object so callers degrade gracefully.
-    // - NEWS_SENTIMENT premium → empty `feed` → no news shown, analyze continues
-    // - competitor OVERVIEW premium → no Name → skipped from compData
-    // - main OVERVIEW/GLOBAL_QUOTE premium → caller's own missing-field
-    //   check surfaces a clean "no data" error instead of a confusing
-    //   "premium endpoint" one that propagates unpredictably.
     console.warn(`[avFetch] Premium endpoint blocked: ${fn}`);
     return {};
   }
 
   if (data['Error Message']) throw new Error(data['Error Message']);
 
-  incrementCalls();
-  return data;
+  // Fell through all checks: response has no payload AND no recognized
+  // limit message. This is Alpha Vantage returning something weird —
+  // e.g. a non-standard informational message, or an empty body.
+  // Stash the reason on the global so the UI can surface it, and don't
+  // increment the local counter (the call produced nothing useful).
+  const reason = data['Information'] || data['Note'] || JSON.stringify(data).substring(0, 200);
+  console.warn(`[avFetch] No payload for ${fn}:`, reason);
+  lastEmptyReason = reason;
+  return {};
 }
 
 function n(v) { return parseFloat(v) || 0; }
@@ -720,6 +723,7 @@ async function analyzeStock() {
     <div class="step" id="loadStep">Fetching live price...</div>
   </div>`;
   setStatus(`⏳ Analyzing ${ticker}...`, '#fde68a');
+  lastEmptyReason = '';
 
   function setStep(msg) { const s = document.getElementById('loadStep'); if (s) s.textContent = msg; }
 
@@ -736,11 +740,17 @@ async function analyzeStock() {
     const tradeDate = gq['07. latest trading day'] || '';
     const prevClose = n(gq['08. previous close']);
 
-    if (!currentPrice) throw new Error(`No price data for "${ticker}". Check symbol — e.g. use GOOG not GOOGL.`);
+    if (!currentPrice) {
+      const hint = lastEmptyReason ? `\n\nAlpha Vantage said: ${lastEmptyReason.substring(0, 240)}` : '';
+      throw new Error(`No price data for "${ticker}". Check symbol — e.g. use GOOG not GOOGL.${hint}`);
+    }
 
     setStep('📊 Financials (2/6)...');
     const ov = await avFetch('OVERVIEW', `symbol=${ticker}`);
-    if (!ov['Name']) throw new Error(`"${ticker}" company data not found.`);
+    if (!ov['Name']) {
+      const hint = lastEmptyReason ? `\n\nAlpha Vantage said: ${lastEmptyReason.substring(0, 240)}` : '';
+      throw new Error(`"${ticker}" company data not found.${hint}`);
+    }
 
     setStep('📰 News (3/6)...');
     let newsItems = [];
@@ -1114,9 +1124,11 @@ async function analyzeStock() {
         </button>
       </div>`;
     } else {
+      // escape HTML + preserve \n so the AV-said diagnostic renders as multiline
+      const safeMsg = (err.message || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])).replace(/\n/g, '<br/>');
       results.innerHTML = `<div class="error-box" style="margin-top:16px">
         <h3>❌ Error</h3>
-        <p style="margin-bottom:12px">${err.message}</p>
+        <p style="margin-bottom:12px;white-space:pre-wrap;text-align:left">${safeMsg}</p>
         <p style="font-size:12px">Examples: AAPL · INTC · MSFT · KO · JNJ · WMT · GOOG</p>
         <button onclick="analyzeStock()" style="margin-top:12px;padding:10px 24px;background:#dc2626;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">🔄 Retry</button>
       </div>`;
