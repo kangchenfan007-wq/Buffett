@@ -495,9 +495,14 @@ async function avFetch(fn, params, _retryAttempt = 0) {
   }
 
   if (isPremiumEndpoint) {
-    const err = new Error('This endpoint requires a premium Alpha Vantage plan. Your key is still usable for free endpoints.');
-    err.isPremiumEndpoint = true;
-    throw err;
+    // Don't throw — return an empty object so callers degrade gracefully.
+    // - NEWS_SENTIMENT premium → empty `feed` → no news shown, analyze continues
+    // - competitor OVERVIEW premium → no Name → skipped from compData
+    // - main OVERVIEW/GLOBAL_QUOTE premium → caller's own missing-field
+    //   check surfaces a clean "no data" error instead of a confusing
+    //   "premium endpoint" one that propagates unpredictably.
+    console.warn(`[avFetch] Premium endpoint blocked: ${fn}`);
+    return {};
   }
 
   if (data['Error Message']) throw new Error(data['Error Message']);
