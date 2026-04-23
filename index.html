@@ -414,6 +414,27 @@ async function avFetch(fn, params, _retryAttempt = 0) {
   if (!res.ok) throw new Error(`Network error ${res.status}`);
   const data = await res.json();
 
+  // Fast path: if the response carries real payload data, it succeeded —
+  // ignore any promotional "Information" text AV occasionally attaches.
+  // This prevents false positives when AV decorates successful responses
+  // with promo like "Upgrade to premium — subscribe at ...".
+  const hasPayload =
+    data['Global Quote'] !== undefined ||
+    data['Symbol'] !== undefined ||
+    data['Name'] !== undefined ||
+    data['feed'] !== undefined ||
+    data['bestMatches'] !== undefined ||
+    data['Time Series (Daily)'] !== undefined ||
+    data['Monthly Time Series'] !== undefined ||
+    data['Weekly Time Series'] !== undefined ||
+    data['quarterlyEarnings'] !== undefined ||
+    data['annualEarnings'] !== undefined;
+
+  if (hasPayload) {
+    incrementCalls();
+    return data;
+  }
+
   const noteStr = (data['Note'] || '').toLowerCase();
   const infoStr = (data['Information'] || '').toLowerCase();
   const combined = noteStr + ' ' + infoStr;
@@ -436,11 +457,11 @@ async function avFetch(fn, params, _retryAttempt = 0) {
       (combined.includes('exceeded') && combined.includes('day'))
     );
 
+  // Only the literal "premium endpoint" phrasing is reliable.
+  // Any other "premium" + "subscribe" combo could be generic promo text.
   const isPremiumEndpoint =
-    !isPerMinuteThrottle && !isDailyLimit && (
-      combined.includes('premium endpoint') ||
-      (combined.includes('premium') && combined.includes('subscribe'))
-    );
+    !isPerMinuteThrottle && !isDailyLimit &&
+    combined.includes('premium endpoint');
 
   if (isDailyLimit) {
     markCurrentKeyBlocked();
@@ -1058,7 +1079,16 @@ async function analyzeStock() {
   } catch(err) {
     setStatus('❌ ' + err.message.substring(0, 60), '#fca5a5');
 
-    if (err.isServerBlock || err.isAllBlocked) {
+    if (err.isPremiumEndpoint) {
+      // Should rarely happen now that avFetch has a payload fast-path,
+      // but surface a useful message if an analyze-critical endpoint
+      // ever actually becomes premium.
+      results.innerHTML = `<div class="error-box" style="margin-top:16px">
+        <h3>🔒 Premium Endpoint</h3>
+        <p style="margin-bottom:12px">One of the endpoints needed for this analysis has been moved to Alpha Vantage's premium tier. Free-tier endpoints (price, financials, news) still work — try again or try a different ticker.</p>
+        <button onclick="analyzeStock()" style="margin-top:12px;padding:10px 24px;background:#dc2626;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">🔄 Retry</button>
+      </div>`;
+    } else if (err.isServerBlock || err.isAllBlocked) {
       results.innerHTML = `<div class="error-box" style="margin-top:16px">
         <h3>🔴 API Server Limit Hit</h3>
         <p style="margin-bottom:12px">${err.message}</p>

@@ -1,6 +1,6 @@
 // Change this version string every time you deploy an update.
 // The service worker will detect the new version and refresh the cache.
-const CACHE_VERSION = 'buffett-v4';
+const CACHE_VERSION = 'buffett-v5';
 const ASSETS_TO_CACHE = [
   './index.html',
   './manifest.json'
