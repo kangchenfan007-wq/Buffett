@@ -222,7 +222,8 @@ function loadKeys() {
 
   const today = new Date().toDateString();
   try {
-    const saved = JSON.parse(localStorage.getItem('av_quota3') || '{"date":"","calls":[0,0],"blocked":[false,false]}');
+    // Bumped v3→v4 to discard stale bogus-block flags from the old detector
+    const saved = JSON.parse(localStorage.getItem('av_quota4') || '{"date":"","calls":[0,0],"blocked":[false,false]}');
     if (saved.date === today) {
       callsPerKey = saved.calls || [0, 0];
       blockedKeys = saved.blocked || [false, false];
@@ -241,7 +242,7 @@ function loadKeys() {
 }
 
 function saveQuota() {
-  localStorage.setItem('av_quota3', JSON.stringify({
+  localStorage.setItem('av_quota4', JSON.stringify({
     date: new Date().toDateString(),
     calls: callsPerKey,
     blocked: blockedKeys
@@ -402,25 +403,52 @@ async function avFetch(fn, params) {
   if (!res.ok) throw new Error(`Network error ${res.status}`);
   const data = await res.json();
 
-  // Check for server-side limit messages
   const noteStr = (data['Note'] || '').toLowerCase();
   const infoStr = (data['Information'] || '').toLowerCase();
-  const isLimitMsg = noteStr.includes('limit') || noteStr.includes('frequency') ||
-                     infoStr.includes('limit') || infoStr.includes('25 requests') ||
-                     infoStr.includes('standard') || infoStr.includes('premium');
+  const combined = noteStr + ' ' + infoStr;
 
-  if (isLimitMsg) {
-    // Alpha Vantage server says this key is blocked
+  // Three distinct signals — only DAILY limits mark the key blocked for the day.
+  // Per-minute throttling is transient; premium-endpoint is endpoint-specific.
+  const isDailyLimit =
+    combined.includes('25 requests per day') ||
+    combined.includes('requests per day') ||
+    combined.includes('daily rate limit') ||
+    (combined.includes('exceeded') && combined.includes('day'));
+
+  const isPerMinuteThrottle =
+    !isDailyLimit && (
+      combined.includes('calls per minute') ||
+      combined.includes('call frequency') ||
+      combined.includes('5 requests per minute')
+    );
+
+  const isPremiumEndpoint =
+    !isDailyLimit && !isPerMinuteThrottle && (
+      combined.includes('premium endpoint') ||
+      (combined.includes('premium') && combined.includes('subscribe'))
+    );
+
+  if (isDailyLimit) {
     markCurrentKeyBlocked();
-    // Try switching to next key
     const nextKey = getCurrentKey();
     if (nextKey && nextKey !== key) {
-      console.log('Key blocked, switching to next key...');
-      return avFetch(fn, params); // retry with new key
+      console.log('Key hit daily limit, switching to next key...');
+      return avFetch(fn, params);
     }
-    // All keys blocked
-    const err = new Error(`Alpha Vantage server blocked this key (daily limit hit on their end, tracked by IP). ${AV_KEYS.length < 2 ? 'Add a 2nd API key in Settings for more quota.' : 'All keys blocked. Come back tomorrow.'}`);
+    const err = new Error(`Alpha Vantage daily limit hit (tracked by IP + key). ${AV_KEYS.length < 2 ? 'Add a 2nd API key in Settings for more quota.' : 'All keys exhausted. Come back tomorrow.'}`);
     err.isServerBlock = true;
+    throw err;
+  }
+
+  if (isPerMinuteThrottle) {
+    const err = new Error('Per-minute rate limit hit (5 calls/min on free tier). Wait ~60s and retry — your key is NOT blocked.');
+    err.isPerMinute = true;
+    throw err;
+  }
+
+  if (isPremiumEndpoint) {
+    const err = new Error('This endpoint requires a premium Alpha Vantage plan. Your key is still usable for free endpoints.');
+    err.isPremiumEndpoint = true;
     throw err;
   }
 
