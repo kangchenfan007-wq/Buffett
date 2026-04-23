@@ -748,8 +748,19 @@ async function analyzeStock() {
     setStep('📊 Financials (2/6)...');
     const ov = await avFetch('OVERVIEW', `symbol=${ticker}`);
     if (!ov['Name']) {
-      const hint = lastEmptyReason ? `\n\nAlpha Vantage said: ${lastEmptyReason.substring(0, 240)}` : '';
-      throw new Error(`"${ticker}" company data not found.${hint}`);
+      // Build a diagnostic from whatever we can see: fallthrough reason,
+      // or the actual OVERVIEW response body if fast-path returned but
+      // the response lacked a Name field (e.g. only Symbol came back).
+      let diag = '';
+      if (lastEmptyReason) {
+        diag = `\n\nAlpha Vantage said: ${lastEmptyReason.substring(0, 240)}`;
+      } else if (Object.keys(ov).length > 0) {
+        const dump = JSON.stringify(ov).substring(0, 300);
+        diag = `\n\nOVERVIEW response: ${dump}`;
+      } else {
+        diag = `\n\nOVERVIEW returned empty. Likely AV blocked this call silently.`;
+      }
+      throw new Error(`"${ticker}" company data not found.${diag}`);
     }
 
     setStep('📰 News (3/6)...');
